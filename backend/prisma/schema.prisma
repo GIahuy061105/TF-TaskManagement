@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id            String      @id @default(uuid())
+  email         String      @unique
+  passwordHash  String
+  fullName      String?
+  plan          Plan        @default(FREE)
+  workspaces    Workspace[] @relation("WorkspaceOwner")
+  timeLogs      TimeLog[]
+  createdAt     DateTime    @default(now())
+}
+
+model Workspace {
+  id                 String    @id @default(uuid())
+  name               String
+  slug               String    @unique
+  ownerId            String
+  owner              User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  stripeCustomerId   String?
+  subscriptionStatus String?
+  projects           Project[]
+  clients            Client[]
+  createdAt          DateTime  @default(now())
+}
+
+model Client {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  name        String
+  email       String
+  projects    Project[]
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  name        String
+  status      String    @default("ACTIVE")
+  tasks       Task[]
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  projectId   String
+  project     Project    @relation(fields: [projectId], references: [id])
+  title       String
+  status      TaskStatus @default(TODO)
+  timeLogs    TimeLog[]
+}
+
+model TimeLog {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  minutes   Int
+  loggedAt  DateTime @default(now())
+}
