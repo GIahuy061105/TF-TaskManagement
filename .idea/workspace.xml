@@ -5,35 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87d0053e-3a9e-4fbb-9672-622d627a09ad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.vscode/extensions.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/postcss.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/icons.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/hero.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/vite.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/vue.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.node.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vite.config.ts" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routes/projects.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routes/task.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/services/project.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/middlewares/authenticate.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/middlewares/authenticate.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/plugins/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/plugins/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/auth.service.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +29,9 @@
   "associatedIndex": 4
 }]]></component>
   <component name="ProjectId" id="3C5MTIF72Gy5mhdQqQFihgnijIW" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
