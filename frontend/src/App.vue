@@ -7,7 +7,6 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style>
-/* Đảm bảo toàn bộ ứng dụng sử dụng font và reset từ main.css của bạn */
 @import './assets/main.css';
 
 #app {
