@@ -1,17 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <RouterLink to="/dashboard" class="text-xl font-bold text-indigo-600">TaskFlow</RouterLink>
-        <span class="text-gray-300">/</span>
-        <span class="text-gray-600 font-medium">Invoices</span>
-      </div>
-      <button @click="handleLogout" class="text-sm text-gray-500 hover:text-red-500 transition">
-        Đăng xuất
-      </button>
-    </nav>
-
-    <div class="max-w-6xl mx-auto px-6 py-8">
+  <AppLayout>
+    <div class="p-8">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Invoices</h2>
         <button
@@ -251,7 +240,7 @@
         </form>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
@@ -260,7 +249,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
 import { useInvoiceStore } from '@/stores/invoice.store.js'
 import { useClientStore } from '@/stores/client.store.js'
-
+import AppLayout from '@/components/common/AppLayout.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const invoiceStore = useInvoiceStore()

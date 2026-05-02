@@ -1,16 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <RouterLink to="/dashboard" class="text-xl font-bold text-indigo-600">TaskFlow</RouterLink>
-        <span class="text-gray-300">/</span>
-        <RouterLink to="/projects" class="text-gray-500 hover:text-gray-700">Projects</RouterLink>
-        <span class="text-gray-300">/</span>
-        <span class="text-gray-900 font-medium">{{ project?.name }}</span>
-      </div>
-    </nav>
-
-    <div class="max-w-6xl mx-auto px-6 py-8">
+  <AppLayout>
+    <div class="p-8">
       <div v-if="!project" class="text-center py-20 text-gray-400">Đang tải...</div>
 
       <div v-else>
@@ -20,6 +10,7 @@
             <p v-if="project.client" class="text-gray-400 mt-1">Client: {{ project.client.name }}</p>
           </div>
           <button
+            v-if="!authStore.isViewer"
             @click="showModal = true"
             class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition"
           >
@@ -44,6 +35,7 @@
 
             <draggable
               v-model="taskColumns[column.status]"
+              :disabled="authStore.isViewer"
               group="tasks"
               item-key="id"
               class="space-y-3 min-h-20"
@@ -137,15 +129,16 @@
         </form>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProjectStore } from '@/stores/project.store.js'
+import { useAuthStore } from '@/stores/auth.store.js'
 import draggable from 'vuedraggable'
-
+import AppLayout from '@/components/common/AppLayout.vue'
 const route = useRoute()
 const projectStore = useProjectStore()
 

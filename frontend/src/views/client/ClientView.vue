@@ -1,20 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <RouterLink to="/dashboard" class="text-xl font-bold text-indigo-600">TaskFlow</RouterLink>
-        <span class="text-gray-300">/</span>
-        <span class="text-gray-600 font-medium">Clients</span>
-      </div>
-      <button @click="handleLogout" class="text-sm text-gray-500 hover:text-red-500 transition">
-        Đăng xuất
-      </button>
-    </nav>
-
-    <div class="max-w-6xl mx-auto px-6 py-8">
+  <AppLayout>
+      <div class="p-8">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Clients</h2>
         <button
+          v-if="authStore.isAdmin"
           @click="showModal = true"
           class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition"
         >
@@ -48,8 +38,7 @@
             <span>{{ client._count?.projects || 0 }} projects</span>
             <span>{{ client._count?.invoices || 0 }} invoices</span>
           </div>
-
-          <div class="flex gap-2">
+          <div v-if="authStore.isAdmin" class="flex gap-2">
             <button
               @click="openEdit(client)"
               class="flex-1 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition"
@@ -141,7 +130,7 @@
         </form>
       </div>
     </div>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
@@ -149,7 +138,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
 import { useClientStore } from '@/stores/client.store.js'
-
+import AppLayout from '@/components/common/AppLayout.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const clientStore = useClientStore()

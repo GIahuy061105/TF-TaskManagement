@@ -7,9 +7,16 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
+  const workspaceId = localStorage.getItem('activeWorkspaceId')
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+
+  if (workspaceId) {
+    config.headers['x-workspace-id'] = workspaceId
+  }
+
   return config
 })
 
@@ -18,6 +25,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('accessToken')
+      localStorage.removeItem('activeWorkspaceId')
       window.location.href = '/login'
     }
     return Promise.reject(error)

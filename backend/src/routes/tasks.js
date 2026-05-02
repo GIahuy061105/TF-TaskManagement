@@ -1,4 +1,5 @@
 import { authenticate } from '../middlewares/authenticate.js'
+import { authorize } from '../middlewares/rbac.js'
 import { updateTask, moveTask, deleteTask, logTime } from '../services/task.service.js'
 
 export async function taskRoutes(app) {
@@ -29,7 +30,7 @@ export async function taskRoutes(app) {
     }
   })
 
-  app.post('/tasks/:id/time-logs', { preHandler: authenticate }, async (request, reply) => {
+  app.post('/tasks/:id/time-logs', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       const { userId } = request.user
       const log = await logTime(request.params.id, userId, request.body)

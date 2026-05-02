@@ -7,7 +7,11 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
+enum Role {
+  ADMIN
+  MEMBER
+  VIEWER
+}
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -16,15 +20,16 @@ model User {
   avatarUrl    String?   @map("avatar_url")
   createdAt    DateTime  @default(now()) @map("created_at")
 
-  workspace    Workspace? @relation("WorkspaceOwner")
-  timeLogs     TimeLog[]
+  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
+  memberships     Member[]
+  timeLogs        TimeLog[]
 
   @@map("users")
 }
 
 model Workspace {
   id                   String   @id @default(uuid())
-  ownerId              String   @unique @map("owner_id")
+  ownerId              String   @map("owner_id")
   name                 String
   slug                 String   @unique
   plan                 String   @default("free")
@@ -36,6 +41,7 @@ model Workspace {
   clients  Client[]
   projects Project[]
   invoices Invoice[]
+  members   Member[]
 
   @@map("workspaces")
 }
@@ -49,7 +55,7 @@ model Client {
   currency    String   @default("USD")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
   projects  Project[]
   invoices  Invoice[]
 
@@ -66,8 +72,8 @@ model Project {
   deadline    DateTime?
   createdAt   DateTime @default(now()) @map("created_at")
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-  client    Client?   @relation(fields: [clientId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
+  client    Client?   @relation(fields: [clientId], references: [id],onDelete : Cascade)
   tasks     Task[]
 
   @@map("projects")
@@ -85,7 +91,7 @@ model Task {
   dueDate     DateTime? @map("due_date")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  project  Project   @relation(fields: [projectId], references: [id])
+  project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
   timeLogs TimeLog[]
 
   @@map("tasks")
@@ -122,8 +128,21 @@ model Invoice {
   paidAt        DateTime? @map("paid_at")
   createdAt     DateTime @default(now()) @map("created_at")
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
-  client    Client    @relation(fields: [clientId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete: Cascade)
+  client    Client    @relation(fields: [clientId], references: [id],onDelete: Cascade)
 
   @@map("invoices")
+}
+model Member {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  role        String   @default("MEMBER") // ADMIN, MEMBER, VIEWER
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id] , onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id],onDelete: Cascade)
+
+  @@unique([workspaceId, userId]) // Một người chỉ có 1 role trong 1 workspace
+  @@map("members")
 }
