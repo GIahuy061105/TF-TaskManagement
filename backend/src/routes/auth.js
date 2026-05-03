@@ -7,7 +7,11 @@ export async function authRoutes(app) {
       const user = await registerUser({ fullName, email, password })
 
       const accessToken = app.jwt.sign(
-        { userId: user.id },
+        {
+          userId: user.id,
+          workspaceId: user.workspace.id,
+          role: 'ADMIN'
+        },
         { expiresIn: '1d' }
       )
 
@@ -41,27 +45,45 @@ export async function authRoutes(app) {
   app.post('/auth/login', async (request, reply) => {
     try {
       const { email, password } = request.body
-
       const { user, workspaces } = await loginUser({ email, password })
 
       const membership = user.memberships?.[0]
-      if (!membership) {
-        throw new Error('Người dùng không thuộc về Workspace nào')
-      }
+      if (!membership) throw new Error('Người dùng không thuộc về Workspace nào')
 
-      const accessToken = app.jwt.sign({ userId: user.id })
+      const accessToken = app.jwt.sign(
+        {
+          userId: user.id,
+          workspaceId: membership.workspace.id,
+          role: membership.role
+        },
+        { expiresIn: '1d' }
+      )
+
+      const refreshToken = app.jwt.sign(
+        { userId: user.id },
+        { expiresIn: '30d' }
+      )
+
+      reply.setCookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30
+      })
 
       return reply.send({
         accessToken,
         user: {
           id: user.id,
           fullName: user.fullName,
-          email: user.email,
+          email: user.email
         },
         workspaces,
         activeWorkspace: {
           id: membership.workspace.id,
           name: membership.workspace.name,
+          slug: membership.workspace.slug,
+          ownerId: membership.workspace.ownerId,
           role: membership.role
         }
       })

@@ -10,34 +10,34 @@ export async function registerUser({ fullName, email, password }) {
   const passwordHash = await bcrypt.hash(password, 10)
 
   const user = await prisma.user.create({
-    data: {
-      fullName,
-      email,
-      passwordHash,
-      memberships: {
-        create: {
-          role: 'ADMIN',
-          workspace: {
-            create: {
-              name: `${fullName}'s Workspace`,
-              slug: `${email.split('@')[0]}-${Date.now()}`,
-              owner: { connect: { email: email } }
+      data: {
+        fullName,
+        email,
+        passwordHash,
+        ownedWorkspaces: {
+          create: {
+            name: `${fullName}'s Workspace`,
+            slug: `${email.split('@')[0]}-${Date.now()}`,
+            members: {
+              create: {
+                role: 'ADMIN'
+              }
             }
           }
         }
+      },
+      include: {
+        ownedWorkspaces: {
+          include: {
+            members: true
+          }
+        }
       }
-    },
-    include: {
-      memberships: {
-        include: { workspace: true }
-      }
+    })
+    return {
+        ...user,
+        workspace: user.ownedWorkspaces[0]
     }
-  })
-
-  return {
-    ...user,
-    workspace: user.memberships[0].workspace
-  }
 }
 
 export async function loginUser({ email, password }) {
@@ -57,7 +57,9 @@ export async function loginUser({ email, password }) {
   const workspaces = user.memberships.map(m => ({
     id: m.workspace.id,
     name: m.workspace.name,
-    role: m.role
+    slug: m.workspace.slug,
+    ownerId: m.workspace.ownerId,
+    role: m.workspace.ownerId === user.id ? 'ADMIN' : m.role
   }))
   return { user, workspaces }
 }

@@ -3,20 +3,26 @@ import { ref, computed } from 'vue'
 import api from '../api/index.js'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
+  const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
   const accessToken = ref(localStorage.getItem('accessToken'))
-
-  const activeWorkspaceId = ref(localStorage.getItem('activeWorkspaceId'))
-  const workspaces = ref([])
-  const userRole = ref(localStorage.getItem('userRole'))
+  const workspaces = ref(JSON.parse(localStorage.getItem('workspaces') || '[]'))
+  const activeWorkspace = ref(JSON.parse(localStorage.getItem('activeWorkspace') || 'null'))
 
   const isLoggedIn = computed(() => !!accessToken.value)
-
-  function setActiveWorkspace(workspaceData, role) {
-    activeWorkspaceId.value = workspaceData.id
-    userRole.value = role
-    localStorage.setItem('activeWorkspaceId', workspaceData.id)
-    localStorage.setItem('userRole', role)
+  const isAdmin = computed(() => activeWorkspace.value?.role === 'ADMIN')
+  const isViewer = computed(() => activeWorkspace.value?.role === 'VIEWER')
+  const isOwner = computed(() => user.value?.id === activeWorkspace.value?.ownerId)
+  const displayRole = computed(() => {
+    if (isOwner.value || activeWorkspace.value?.role === 'ADMIN') {
+      return 'ADMIN';
+    }
+    return activeWorkspace.value?.role || 'MEMBER';
+  });
+  function saveToStorage() {
+    localStorage.setItem('accessToken', accessToken.value || '')
+    localStorage.setItem('user', JSON.stringify(user.value))
+    localStorage.setItem('workspaces', JSON.stringify(workspaces.value))
+    localStorage.setItem('activeWorkspace', JSON.stringify(activeWorkspace.value))
   }
 
   async function register(fullName, email, password) {
@@ -24,10 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
 
     accessToken.value = res.data.accessToken
     user.value = res.data.user
+    workspaces.value = [{ ...res.data.user.workspace, role: 'ADMIN' }]
+    activeWorkspace.value = {
+      ...res.data.user.workspace,
+      role: 'ADMIN'
+    }
 
-    setActiveWorkspace(res.data.user.workspace, 'ADMIN')
-
-    localStorage.setItem('accessToken', res.data.accessToken)
+    saveToStorage()
     return res.data
   }
 
@@ -37,48 +46,42 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken.value = res.data.accessToken
     user.value = res.data.user
     workspaces.value = res.data.workspaces
+    activeWorkspace.value = res.data.activeWorkspace
 
-    setActiveWorkspace(res.data.activeWorkspace, res.data.activeWorkspace.role)
-
-    localStorage.setItem('accessToken', res.data.accessToken)
+    saveToStorage()
     return res.data
+  }
+
+  function switchWorkspace(workspaceId) {
+    const ws = workspaces.value.find(w => w.id === workspaceId)
+    if (!ws) return
+    activeWorkspace.value = ws
+    saveToStorage()
+    window.location.reload()
   }
 
   async function logout() {
     await api.post('/auth/logout')
     accessToken.value = null
     user.value = null
-    activeWorkspaceId.value = null
-    userRole.value = null
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('activeWorkspaceId')
-    localStorage.removeItem('userRole')
+    workspaces.value = []
+    activeWorkspace.value = null
+    localStorage.clear()
   }
 
-  const isAdmin = computed(() => userRole.value === 'ADMIN')
-  const isViewer = computed(() => userRole.value === 'VIEWER')
-  const activeWorkspace = computed(() => {
-  return workspaces.value.find(ws => ws.id === activeWorkspaceId.value) || null
-  })
-  const isOwner = computed(() => {
-    return user.value?.id === activeWorkspace.value?.ownerId
-  })
-
-  const displayRole = computed(() => {
-    return isOwner.value ? 'ADMIN' : userRole.value
-  })
   return {
     user,
-    activeWorkspaceId,
+    accessToken,
     workspaces,
+    activeWorkspace,
+    isLoggedIn,
     isAdmin,
     isViewer,
-    isLoggedIn,
+    isOwner,
     register,
+    displayRole,
     login,
     logout,
-    setActiveWorkspace,
-    displayRole,
-    activeWorkspace
+    switchWorkspace
   }
 })

@@ -2,13 +2,17 @@
   <div class="flex min-h-screen bg-slate-50">
     <!-- Sidebar -->
     <aside class="w-56 bg-white border-r border-slate-200 flex flex-col fixed h-full z-30">
-      <!-- Logo -->
-      <div class="px-5 py-5 border-b border-slate-100">
+      <!-- Logo & Notification -->
+      <div class="px-5 py-5 border-b border-slate-100 flex justify-between items-center ">
         <span class="text-lg font-bold text-slate-900">Task<span class="text-indigo-500">Flow</span></span>
+        <button v-if="invitations.length > 0" @click="showInviteModal = true" class="relative p-1">
+                  <span class="text-lg">🔔</span>
+                  <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+        </button>
       </div>
 
       <!-- Nav -->
-      <nav class="flex-1 px-3 py-4 space-y-1">
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2 mb-2">Workspace</p>
 
         <RouterLink
@@ -38,8 +42,23 @@
       <!-- User -->
       <div class="px-3 py-6 border-t border-slate-100 mt-auto">
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
-          <!-- Hàng trên: Avatar và Nút Logout -->
-          <div class="flex items-center justify-between mb-3">
+        <!--  Workspace (Switcher) -->
+                  <div class="mb-4">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Chuyển không gian làm việc
+                    </label>
+                    <select
+                      :value="authStore.activeWorkspace?.id"
+                      @change="e => authStore.switchWorkspace(e.target.value)"
+                      class="w-full text-xs bg-white border border-slate-200 rounded-lg p-1.5 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                    >
+                      <option v-for="ws in authStore.workspaces" :key="ws.id" :value="ws.id">
+                        {{ ws.name }} ({{ ws.role }})
+                      </option>
+                    </select>
+                  </div>
+          <!-- Avatar và Nút Logout -->
+          <div class="flex items-center justify-between mb-3 pt-3 border-t border-slate-200">
             <div v-if="authStore.user?.avatarUrl" class="w-10 h-10 rounded-xl overflow-hidden shadow-sm">
               <img :src="authStore.user.avatarUrl" class="w-full h-full object-cover" />
             </div>
@@ -59,11 +78,11 @@
             <p class="text-sm font-bold text-slate-900 truncate">
               {{ authStore.user?.fullName }}
             </p>
-            <div class="mt-2 pt-2 border-t border-slate-200">
+            <div class="mt-2">
               <p class="text-[10px] font-black text-indigo-600 uppercase tracking-wider mb-0.5">
                 Workspace
               </p>
-              <p class="text-xs font-medium text-slate-600 leading-tight break-words">
+              <p class="text-xs font-medium text-slate-600 leading-tight break-words mb-1">
                 {{ authStore.activeWorkspace?.name || 'Đang tải...' }}
               </p>
               <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold uppercase">
@@ -74,6 +93,47 @@
         </div>
       </div>
     </aside>
+    <!-- Invitation -->
+        <div v-if="showInviteModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-lg text-slate-900">Lời mời tham gia</h3>
+              <button @click="showInviteModal = false" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
+              <div
+                v-for="invite in invitations"
+                :key="invite.id"
+                class="p-4 border border-slate-100 rounded-xl flex items-center justify-between bg-slate-50"
+              >
+                <div class="min-w-0 flex-1 mr-3">
+                  <p class="text-sm font-bold text-slate-900 truncate">{{ invite.workspace?.name }}</p>
+                  <p class="text-[10px] text-slate-500 uppercase font-semibold">Quyền: {{ invite.role }}</p>
+                </div>
+
+                <div class="flex gap-2 shrink-0">
+                  <button
+                    @click="acceptInvite(invite.token)"
+                    class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-700 transition shadow-sm"
+                  >
+                    Chấp nhận
+                  </button>
+                  <button
+                    @click="declineInvite(invite.token)"
+                    class="bg-white border border-slate-200 text-slate-600 text-[10px] px-3 py-1.5 rounded-lg font-bold hover:bg-slate-50 transition"
+                  >
+                    Từ chối
+                  </button>
+                </div>
+              </div>
+
+              <div v-if="invitations.length === 0" class="text-center py-8">
+                <p class="text-slate-400 text-sm italic">Không có lời mời nào đang chờ xử lý</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
     <!-- Main content -->
     <main class="flex-1 ml-56 min-h-screen">
@@ -83,27 +143,56 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
+import api from '@/api/index.js'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-
+const invitations = ref([])
+const showInviteModal = ref(false)
 const navItems = [
   { to: '/dashboard', icon: '⊞', label: 'Dashboard' },
   { to: '/projects', icon: '◫', label: 'Projects' },
   { to: '/clients', icon: '◎', label: 'Clients' },
   { to: '/invoices', icon: '≡', label: 'Invoices' }
 ]
-
+onMounted(async () => {
+  try {
+    const res = await api.get('/workspace/invitations')
+    invitations.value = res.data
+  } catch (err) {
+    console.error('Không thể lấy danh sách lời mời:', err)
+  }
+})
 const initial = computed(() => {
   const name = authStore.user?.fullName || 'User'
   return name.charAt(0).toUpperCase()
 })
 function isActive(path) {
   return route.path === path || route.path.startsWith(path + '/')
+}
+async function acceptInvite(token) {
+  try {
+    await api.post(`/invitations/${token}/accept`)
+    await authStore.login()
+    window.location.reload()
+  } catch (err) {
+    alert(err.response?.data?.message || 'Lỗi khi chấp nhận')
+  }
+}
+async function declineInvite(token) {
+  try {
+    await api.post(`/invitations/${token}/decline`)
+    invitations.value = invitations.value.filter(i => i.token !== token)
+    if (invitations.value.length === 0) {
+      showInviteModal.value = false
+    }
+  } catch (err) {
+    alert(err.response?.data?.message || 'Lỗi khi từ chối lời mời')
+  }
 }
 
 async function handleLogout() {

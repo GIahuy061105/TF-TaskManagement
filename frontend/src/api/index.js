@@ -7,14 +7,14 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
-  const workspaceId = localStorage.getItem('activeWorkspaceId')
+  const activeWorkspace = JSON.parse(localStorage.getItem('activeWorkspace') || 'null')
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
 
-  if (workspaceId) {
-    config.headers['x-workspace-id'] = workspaceId
+  if (activeWorkspace?.id) {
+    config.headers['x-workspace-id'] = activeWorkspace.id
   }
 
   return config

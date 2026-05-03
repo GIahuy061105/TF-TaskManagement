@@ -12,6 +12,11 @@ enum Role {
   MEMBER
   VIEWER
 }
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -23,6 +28,7 @@ model User {
   ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
   memberships     Member[]
   timeLogs        TimeLog[]
+  sentInvitations Invitation[] @relation("InvitationInviter")
 
   @@map("users")
 }
@@ -42,6 +48,7 @@ model Workspace {
   projects Project[]
   invoices Invoice[]
   members   Member[]
+  invitations Invitation[]
 
   @@map("workspaces")
 }
@@ -137,7 +144,7 @@ model Member {
   id          String   @id @default(uuid())
   workspaceId String   @map("workspace_id")
   userId      String   @map("user_id")
-  role        String   @default("MEMBER") // ADMIN, MEMBER, VIEWER
+  role        Role     @default(MEMBER) // ADMIN, MEMBER, VIEWER
   createdAt   DateTime @default(now()) @map("created_at")
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id] , onDelete: Cascade)
@@ -145,4 +152,21 @@ model Member {
 
   @@unique([workspaceId, userId]) // Một người chỉ có 1 role trong 1 workspace
   @@map("members")
+}
+model Invitation {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  email       String
+  role        Role   @default(MEMBER)
+  token       String   @unique @default(uuid())
+  status      InvitationStatus @default(PENDING)
+  invitedBy   String   @map("invited_by")
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  inviter     User      @relation("InvitationInviter", fields: [invitedBy], references: [id])
+
+  @@unique([workspaceId, email])
+  @@map("invitations")
 }
