@@ -49,7 +49,10 @@ export async function updateWorkspace(id, data) {
   return prisma.workspace.update({
     where: { id },
     data: {
-      name: data.name
+      name: data.name,
+      description: data.description !== undefined ? data.description : undefined,
+      logoUrl: data.logoUrl !== undefined ? data.logoUrl : undefined,
+      settings: data.settings !== undefined ? data.settings : undefined,
     }
   })
 }

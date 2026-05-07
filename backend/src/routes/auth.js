@@ -1,5 +1,8 @@
 import { registerUser, loginUser } from '../services/auth.service.js'
-
+import { authenticate } from '../middlewares/authenticate.js'
+import { authorize } from '../middlewares/rbac.js'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 export async function authRoutes(app) {
   app.post('/auth/register', async (request, reply) => {
     try {
@@ -9,6 +12,7 @@ export async function authRoutes(app) {
       const accessToken = app.jwt.sign(
         {
           userId: user.id,
+          email: user.email,
           workspaceId: user.workspace.id,
           role: 'ADMIN'
         },
@@ -53,6 +57,7 @@ export async function authRoutes(app) {
       const accessToken = app.jwt.sign(
         {
           userId: user.id,
+          email: user.email,
           workspaceId: membership.workspace.id,
           role: membership.role
         },
@@ -75,8 +80,8 @@ export async function authRoutes(app) {
         accessToken,
         user: {
           id: user.id,
+          email: user.email,
           fullName: user.fullName,
-          email: user.email
         },
         workspaces,
         activeWorkspace: {
@@ -95,5 +100,25 @@ export async function authRoutes(app) {
   app.post('/auth/logout', async (request, reply) => {
     reply.clearCookie('refreshToken')
     return reply.send({ message: 'Logged out' })
+  })
+  app.get('/auth/me', { preHandler: authenticate }, async (request, reply) => {
+    const userId = request.user.userId || request.user.id
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        memberships: { include: { workspace: true } }
+      }
+    })
+
+    const workspaces = user.memberships.map(m => ({
+      id: m.workspace.id,
+      name: m.workspace.name,
+      slug: m.workspace.slug,
+      ownerId: m.workspace.ownerId,
+      role: m.role
+    }))
+    const { passwordHash, ...userSafe } = user
+    return reply.send({ user: userSafe, workspaces })
   })
 }

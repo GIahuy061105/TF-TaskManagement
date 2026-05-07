@@ -17,6 +17,54 @@ enum InvitationStatus {
   ACCEPTED
   DECLINED
 }
+enum ProjectStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+enum PlanType {
+  FREE
+  PRO
+  ENTERPRISE
+}
+enum EntityType {
+  TASK
+  PROJECT
+  INVOICE
+  CLIENT
+  WORKSPACE
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  COMMENT_ADDED
+  INVOICE_PAID
+  WORKSPACE_INVITE
+  SYSTEM_ALERT
+}
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -24,12 +72,17 @@ model User {
   fullName     String    @map("full_name")
   avatarUrl    String?   @map("avatar_url")
   createdAt    DateTime  @default(now()) @map("created_at")
-
-  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
   memberships     Member[]
   timeLogs        TimeLog[]
-  sentInvitations Invitation[] @relation("InvitationInviter")
+  timezone    String   @default("Asia/Ho_Chi_Minh")
+  language    String   @default("vi")
+  lastSeenAt  DateTime? @map("last_seen_at")
+  comments      Comment[]
+  notifications Notification[]
 
+  assignedTasks Task[]         @relation("TaskAssignee")
+  sentInvitations Invitation[] @relation("InvitationInviter")
+  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
   @@map("users")
 }
 
@@ -38,18 +91,21 @@ model Workspace {
   ownerId              String   @map("owner_id")
   name                 String
   slug                 String   @unique
-  plan                 String   @default("free")
+  plan                 PlanType  @default(FREE)
   stripeCustomerId     String?  @map("stripe_customer_id")
   stripeSubscriptionId String?  @map("stripe_subscription_id")
   createdAt            DateTime @default(now()) @map("created_at")
-
-  owner    User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  logoUrl     String?  @map("logo_url")
   clients  Client[]
   projects Project[]
   invoices Invoice[]
   members   Member[]
   invitations Invitation[]
+  notifications Notification[]
+  description String?
+  settings    Json?    @default("{}")
 
+  owner    User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
   @@map("workspaces")
 }
 
@@ -74,15 +130,17 @@ model Project {
   workspaceId String   @map("workspace_id")
   clientId    String?  @map("client_id")
   name        String
-  status      String   @default("active")
+  status      ProjectStatus @default(ACTIVE)
   hourlyRate  Decimal? @map("hourly_rate")
   deadline    DateTime?
   createdAt   DateTime @default(now()) @map("created_at")
+  tasks     Task[]
+  color       String?  @default("#6366f1")
+  icon        String?  @default("📁")
+  description String?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
   client    Client?   @relation(fields: [clientId], references: [id],onDelete : Cascade)
-  tasks     Task[]
-
   @@map("projects")
 }
 
@@ -90,17 +148,25 @@ model Task {
   id          String   @id @default(uuid())
   projectId   String   @map("project_id")
   assigneeId  String?  @map("assignee_id")
+  assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
   title       String
   description String?
-  status      String   @default("todo")
-  priority    String   @default("medium")
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority   @default(MEDIUM)
   position    Int      @default(0)
   dueDate     DateTime? @map("due_date")
   createdAt   DateTime @default(now()) @map("created_at")
-
-  project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
+  parentId      String?   @map("parent_id")
+  estimatedMins Int?      @map("estimated_mins")
+  completedAt   DateTime? @map("completed_at")
+  tags          String[]  @default([])
+  attachments   Json?
+  comments  Comment[]
   timeLogs TimeLog[]
 
+  project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
+  parent    Task?   @relation("SubTasks", fields: [parentId], references: [id])
+  subTasks  Task[]  @relation("SubTasks")
   @@map("tasks")
 }
 
@@ -124,7 +190,7 @@ model Invoice {
   workspaceId   String   @map("workspace_id")
   clientId      String   @map("client_id")
   invoiceNumber String   @map("invoice_number")
-  status        String   @default("draft")
+  status        InvoiceStatus   @default(DRAFT)
   lineItems     Json     @map("line_items")
   subtotal      Decimal
   taxRate       Decimal  @default(0) @map("tax_rate")
@@ -169,4 +235,34 @@ model Invitation {
 
   @@unique([workspaceId, email])
   @@map("invitations")
+}
+model Comment {
+  id        String   @id @default(uuid())
+  taskId    String   @map("task_id")
+  userId    String   @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("comments")
+}
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  workspaceId String   @map("workspace_id")
+  type        NotificationType
+  title       String
+  body        String?
+  isRead      Boolean  @default(false) @map("is_read")
+  entityId    String?  @map("entity_id")
+  entityType  EntityType?  @map("entity_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }

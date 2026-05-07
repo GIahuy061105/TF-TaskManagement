@@ -11,6 +11,7 @@
         </button>
       </div>
 
+
       <!-- Nav -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2 mb-2">Workspace</p>
@@ -27,6 +28,55 @@
           <span class="text-base">{{ item.icon }}</span>
           {{ item.label }}
         </RouterLink>
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <button
+            @click="showInviteForm = true"
+            class="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2"
+          >
+            <span>+</span> Mời thành viên
+          </button>
+        </div>
+
+        <div v-if="showInviteForm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="font-bold text-lg text-slate-900 mb-4">Mời vào Workspace</h3>
+
+            <div class="space-y-4">
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Email người nhận</label>
+                <input
+                  v-model="inviteEmail"
+                  type="email"
+                  placeholder="email@example.com"
+                  class="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Vai trò mặc định</label>
+                <div class="mt-1 px-3 py-2 bg-slate-100 text-slate-600 text-sm rounded-lg font-medium">
+                  MEMBER (Thành viên)
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  @click="handleSendInvite"
+                  :disabled="isSending"
+                  class="flex-1 bg-indigo-600 text-white py-2 rounded-xl font-bold text-sm hover:bg-indigo-700 disabled:bg-slate-300"
+                >
+                  {{ isSending ? 'Đang gửi...' : 'Gửi lời mời' }}
+                </button>
+                <button
+                  @click="showInviteForm = false"
+                  class="px-4 py-2 text-slate-500 font-medium text-sm hover:bg-slate-100 rounded-xl"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="pt-4">
           <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2 mb-2">Account</p>
@@ -108,7 +158,10 @@
                 class="p-4 border border-slate-100 rounded-xl flex items-center justify-between bg-slate-50"
               >
                 <div class="min-w-0 flex-1 mr-3">
-                  <p class="text-sm font-bold text-slate-900 truncate">{{ invite.workspace?.name }}</p>
+                  <p class="text-sm font-bold">{{ invite.workspace?.name }}</p>
+                      <p class="text-[10px] text-slate-500 italic">
+                        Được mời bởi: {{ invite.inviter?.fullName || 'Người dùng hệ thống' }}
+                      </p>
                   <p class="text-[10px] text-slate-500 uppercase font-semibold">Quyền: {{ invite.role }}</p>
                 </div>
 
@@ -159,9 +212,12 @@ const navItems = [
   { to: '/clients', icon: '◎', label: 'Clients' },
   { to: '/invoices', icon: '≡', label: 'Invoices' }
 ]
+const showInviteForm = ref(false)
+const inviteEmail = ref('')
+const isSending = ref(false)
 onMounted(async () => {
   try {
-    const res = await api.get('/workspace/invitations')
+    const res = await api.get('/my-invitations')
     invitations.value = res.data
   } catch (err) {
     console.error('Không thể lấy danh sách lời mời:', err)
@@ -177,7 +233,9 @@ function isActive(path) {
 async function acceptInvite(token) {
   try {
     await api.post(`/invitations/${token}/accept`)
-    await authStore.login()
+    await authStore.checkAuth()
+    alert('Đã gia nhập Workspace mới!')
+    showInviteModal.value = false
     window.location.reload()
   } catch (err) {
     alert(err.response?.data?.message || 'Lỗi khi chấp nhận')
@@ -198,5 +256,23 @@ async function declineInvite(token) {
 async function handleLogout() {
   await authStore.logout()
   router.push('/login')
+}
+async function handleSendInvite() {
+  if (!inviteEmail.value) return alert('Vui lòng nhập email')
+
+  isSending.value = true
+  try {
+    await api.post('/workspace/invite', {
+      email: inviteEmail.value,
+      role: 'MEMBER'
+    })
+    alert('Đã gửi lời mời thành công!')
+    inviteEmail.value = ''
+    showInviteForm.value = false
+  } catch (err) {
+    alert(err.response?.data?.message || 'Không thể gửi lời mời')
+  } finally {
+    isSending.value = false
+  }
 }
 </script>

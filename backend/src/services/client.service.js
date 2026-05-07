@@ -45,8 +45,8 @@ export async function updateClient(id, workspaceId, data) {
     data: {
       name: data.name,
       email: data.email,
-      company: data.company,
-      currency: data.currency
+      company: data.company || null,
+      currency: data.currency || 'USD'
     }
   })
 }

@@ -5,16 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87d0053e-3a9e-4fbb-9672-622d627a09ad" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/routes/workspace.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/services/invitation.service.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/stores/workspace.store.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/middlewares/authenticate.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/middlewares/authenticate.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/plugins/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/plugins/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/workspace.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/workspace.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/auth.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/client.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/client.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/invitation.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/invitation.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/invoice.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/invoice.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/project.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/project.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/task.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/task.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/workspace.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/workspace.service.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/stores/auth.store.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/stores/auth.store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/stores/counter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/stores/project.store.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/stores/project.store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/dashboard/DashboardView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/dashboard/DashboardView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/invoices/InvoiceView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/invoices/InvoiceView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -18,6 +18,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return activeWorkspace.value?.role || 'MEMBER';
   });
+  const userTimezone = computed(() => user.value?.timezone || 'Asia/Ho_Chi_Minh')
+  const userLanguage = computed(() => user.value?.language || 'vi')
+  const workspacePlan = computed(() => activeWorkspace.value?.plan || 'FREE')
+  const workspaceSettings = computed(() => activeWorkspace.value?.settings || {})
+  const workspaceLogo = computed(() => activeWorkspace.value?.logoUrl || null)
+
   function saveToStorage() {
     localStorage.setItem('accessToken', accessToken.value || '')
     localStorage.setItem('user', JSON.stringify(user.value))
@@ -51,6 +57,19 @@ export const useAuthStore = defineStore('auth', () => {
     saveToStorage()
     return res.data
   }
+  async function checkAuth() {
+    try {
+      const res = await api.get('/auth/me')
+      user.value = res.data.user
+      workspaces.value = res.data.workspaces
+      const currentActiveId = activeWorkspace.value?.id
+      const updatedActive = workspaces.value.find(w => w.id === currentActiveId) || workspaces.value[0]
+      activeWorkspace.value = updatedActive
+      saveToStorage()
+    } catch (err) {
+      console.error("Cập nhật auth thất bại:", err)
+    }
+  }
 
   function switchWorkspace(workspaceId) {
     const ws = workspaces.value.find(w => w.id === workspaceId)
@@ -80,8 +99,14 @@ export const useAuthStore = defineStore('auth', () => {
     isOwner,
     register,
     displayRole,
+    userTimezone,
+    userLanguage,
+    workspacePlan,
+    workspaceSettings,
+    workspaceLogo,
     login,
     logout,
+    checkAuth,
     switchWorkspace
   }
 })

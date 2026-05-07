@@ -19,7 +19,7 @@ export async function inviteMember(workspaceId, invitedBy, { email, role }) {
 
   // Kiểm tra invitation pending chưa
   const existingInvite = await prisma.invitation.findFirst({
-    where: { workspaceId, email, status: 'pending' }
+    where: { workspaceId, email, status: 'PENDING' }
   })
   if (existingInvite) throw new Error('Đã gửi lời mời cho email này rồi')
 
@@ -61,17 +61,18 @@ export async function inviteMember(workspaceId, invitedBy, { email, role }) {
 }
 
 export async function acceptInvitation(token, userId) {
-  const invitation = await prisma.invitation.findUnique({ where: { token } })
+  const invitation = await prisma.invitation.findUnique({ where: { token } , include: {workspace : true}})
 
   if (!invitation) throw new Error('Lời mời không tồn tại')
-  if (invitation.status !== 'pending') throw new Error('Lời mời này đã được xử lý rồi')
+  if (invitation.status !== 'PENDING') throw new Error('Lời mời này đã được xử lý rồi')
   if (new Date() > invitation.expiresAt) throw new Error('Lời mời đã hết hạn')
 
-  // Kiểm tra email user có khớp không
   const user = await prisma.user.findUnique({ where: { id: userId } })
-  if (user.email !== invitation.email) throw new Error('Email không khớp với lời mời')
+  if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      throw new Error('Email tài khoản hiện tại không khớp với email nhận lời mời');
+    }
 
-  // Add vào workspace
+
   await prisma.member.create({
     data: {
       workspaceId: invitation.workspaceId,
@@ -80,10 +81,9 @@ export async function acceptInvitation(token, userId) {
     }
   })
 
-  // Update status invitation
   await prisma.invitation.update({
     where: { token },
-    data: { status: 'accepted' }
+    data: { status: 'ACCEPTED' }
   })
   return {
        ...invitation.workspace,
@@ -100,7 +100,7 @@ export async function declineInvitation(token, userId) {
 
   return prisma.invitation.update({
     where: { token },
-    data: { status: 'declined' }
+    data: { status: 'DECLINED' }
   })
 }
 
@@ -118,7 +118,13 @@ export async function getInvitationByToken(token) {
 
 export async function getPendingInvitations(workspaceId) {
   return prisma.invitation.findMany({
-    where: { workspaceId, status: 'pending' },
+    where: { workspaceId, status: 'PENDING' },
+    include: {
+          workspace: true,
+          inviter: {
+            select: { fullName: true, email: true }
+          }
+        },
     orderBy: { createdAt: 'desc' }
   })
 }

@@ -25,8 +25,13 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('accessToken')
-      localStorage.removeItem('activeWorkspaceId')
-      window.location.href = '/login'
+      localStorage.removeItem('activeWorkspace')
+      localStorage.removeItem('user')
+      localStorage.removeItem('workspaces')
+
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }

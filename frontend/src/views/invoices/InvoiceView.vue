@@ -16,13 +16,13 @@
         <div class="bg-white rounded-2xl border border-gray-200 p-6">
           <p class="text-sm text-gray-500 mb-1">Chờ thanh toán</p>
           <p class="text-2xl font-bold text-amber-500">
-            ${{ totalByStatus('sent') }}
+            ${{ totalByStatus('SENT') }}
           </p>
         </div>
         <div class="bg-white rounded-2xl border border-gray-200 p-6">
           <p class="text-sm text-gray-500 mb-1">Đã thanh toán</p>
           <p class="text-2xl font-bold text-green-500">
-            ${{ totalByStatus('paid') }}
+            ${{ totalByStatus('PAID') }}
           </p>
         </div>
         <div class="bg-white rounded-2xl border border-gray-200 p-6">
@@ -67,9 +67,9 @@
                 <span
                   class="text-xs font-medium px-2.5 py-1 rounded-full"
                   :class="{
-                    'bg-gray-100 text-gray-500': invoice.status === 'draft',
-                    'bg-amber-100 text-amber-600': invoice.status === 'sent',
-                    'bg-green-100 text-green-600': invoice.status === 'paid'
+                    'bg-gray-100 text-gray-500': invoice.status === 'DRAFT',
+                    'bg-amber-100 text-amber-600': invoice.status === 'SENT',
+                    'bg-green-100 text-green-600': invoice.status === 'PAID'
                   }"
                 >
                   {{ statusLabel(invoice.status) }}
@@ -81,21 +81,21 @@
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
                   <button
-                    v-if="invoice.status === 'draft'"
+                    v-if="invoice.status === 'DRAFT'"
                     @click="handleSend(invoice.id)"
                     class="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition font-medium"
                   >
                     Gửi
                   </button>
                   <button
-                    v-if="invoice.status === 'sent'"
+                    v-if="invoice.status === 'SENT'"
                     @click="handleMarkPaid(invoice.id)"
                     class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition font-medium"
                   >
                     Đã nhận tiền
                   </button>
                   <button
-                    v-if="invoice.status === 'draft'"
+                    v-if="invoice.status === 'DRAFT'"
                     @click="handleDelete(invoice.id)"
                     class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 transition"
                   >
@@ -284,7 +284,7 @@ function totalByStatus(status) {
 }
 
 function statusLabel(status) {
-  return { draft: 'Draft', sent: 'Đã gửi', paid: 'Đã thanh toán' }[status] || status
+  return { DRAFT: 'Bản nháp', SENT: 'Đã gửi', PAID: 'Đã thanh toán' }[status] || status
 }
 
 function addLineItem() {

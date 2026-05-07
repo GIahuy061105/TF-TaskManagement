@@ -1,11 +1,22 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref , computed } from 'vue'
 import api from '../api/index.js'
 
 export const useProjectStore = defineStore('project', () => {
   const projects = ref([])
   const currentProject = ref(null)
-
+  const todoTasks = computed(() =>
+      currentProject.value?.tasks?.filter(t => t.status === 'TODO') || []
+  )
+  const inProgressTasks = computed(() =>
+      currentProject.value?.tasks?.filter(t => t.status === 'IN_PROGRESS') || []
+  )
+  const inReviewTasks = computed(() =>
+      currentProject.value?.tasks?.filter(t => t.status === 'IN_REVIEW') || []
+  )
+  const doneTasks = computed(() =>
+      currentProject.value?.tasks?.filter(t => t.status === 'DONE') || []
+  )
   async function fetchProjects() {
     const res = await api.get('/projects')
     projects.value = res.data
@@ -32,13 +43,28 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   async function moveTask(taskId, status, position) {
-    const res = await api.patch(`/tasks/${taskId}/move`, { status, position })
-    return res.data
+      const normalizedStatus = status.toUpperCase()
+      if (currentProject.value) {
+        const task = currentProject.value.tasks.find(t => t.id === taskId)
+        if (task) {
+          task.status = normalizedStatus
+          task.position = position
+        }
+      }
+      const res = await api.patch(`/tasks/${taskId}/move`, {
+        status: normalizedStatus,
+        position
+      })
+      return res.data
   }
 
   return {
     projects,
     currentProject,
+    todoTasks,
+    inProgressTasks,
+    inReviewTasks,
+    doneTasks,
     fetchProjects,
     fetchProject,
     createProject,

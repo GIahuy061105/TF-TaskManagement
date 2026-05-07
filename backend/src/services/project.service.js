@@ -35,7 +35,10 @@ export async function createProject(workspaceId, data) {
       clientId: data.clientId || null,
       hourlyRate: data.hourlyRate || null,
       deadline: data.deadline ? new Date(data.deadline) : null,
-      status: 'active'
+      status: data.status ? data.status.toUpperCase() : 'ACTIVE',
+      color: data.color || '#6366f1',
+      icon: data.icon || '📁',
+      description: data.description || null
     },
     include: { client: true }
   })

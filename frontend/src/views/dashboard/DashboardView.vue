@@ -72,9 +72,9 @@
             </div>
             <span
               class="text-xs font-semibold px-2.5 py-1 rounded-full"
-              :class="project.status === 'active' ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-400'"
+              :class="project.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-400'"
             >
-              {{ project.status === 'active' ? 'Active' : 'Done' }}
+              {{ project.status === 'ACTIVE' ? 'Active' : 'Done' }}
             </span>
           </div>
         </div>

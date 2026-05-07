@@ -10,21 +10,28 @@ export async function getTasksByProject(projectId) {
 }
 
 export async function createTask(projectId, data) {
+  const taskStatus = data.status ? data.status.toUpperCase() : 'TODO'
   const lastTask = await prisma.task.findFirst({
-    where: { projectId, status: data.status || 'todo' },
+    where: { projectId, status: taskStatus },
     orderBy: { position: 'desc' }
   })
+
+  const nextPosition = lastTask ? lastTask.position + 1 : 0
 
   return prisma.task.create({
     data: {
       projectId,
       title: data.title,
       description: data.description || null,
-      status: data.status || 'todo',
-      priority: data.priority || 'medium',
-      position: lastTask ? lastTask.position + 1 : 0,
+      assigneeId: data.assigneeId || null,
+      status: taskStatus,
+      position: data.position ?? nextPosition,
+      priority: data.priority ? data.priority.toUpperCase() : 'MEDIUM',
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      assigneeId: data.assigneeId || null
+      parentId: data.parentId || null,
+      estimatedMins: data.estimatedMins ? parseInt(data.estimatedMins) : null,
+      tags: data.tags || [],
+      attachments: data.attachments || null
     }
   })
 }
@@ -35,8 +42,8 @@ export async function updateTask(id, data) {
     data: {
       title: data.title,
       description: data.description,
-      status: data.status,
-      priority: data.priority,
+      status: data.status ? data.status.toUpperCase() : undefined,
+      priority: data.priority ? data.priority.toUpperCase() : undefined,
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
       assigneeId: data.assigneeId
     }
@@ -47,7 +54,7 @@ export async function moveTask(id, data) {
   return prisma.task.update({
     where: { id },
     data: {
-      status: data.status,
+      status: data.status ? data.status.toUpperCase() : undefined,
       position: data.position
     }
   })
