@@ -19,23 +19,22 @@ export async function createTask(projectId, data) {
   const nextPosition = lastTask ? lastTask.position + 1 : 0
 
   return prisma.task.create({
-    data: {
-      projectId,
-      title: data.title,
-      description: data.description || null,
-      assigneeId: data.assigneeId || null,
-      status: taskStatus,
-      position: data.position ?? nextPosition,
-      priority: data.priority ? data.priority.toUpperCase() : 'MEDIUM',
-      dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      parentId: data.parentId || null,
-      estimatedMins: data.estimatedMins ? parseInt(data.estimatedMins) : null,
-      tags: data.tags || [],
-      attachments: data.attachments || null
-    }
-  })
-}
+      data: {
+        projectId,
+        title: data.title,
+        description: data.description || null,
+        status: taskStatus,
+        position: data.position ?? nextPosition,
+        priority: data.priority ? data.priority.toUpperCase() : 'MEDIUM',
+        dueDate: data.dueDate ? new Date(data.dueDate) : null,
+        estimatedMins: data.estimatedMins ? parseInt(data.estimatedMins) : null,
 
+        assignees: (data.assigneeIds && data.assigneeIds.length > 0)
+          ? { connect: data.assigneeIds.map(id => ({ id })) }
+          : undefined
+      }
+    })
+  }
 export async function updateTask(id, data) {
   return prisma.task.update({
     where: { id },
@@ -45,7 +44,9 @@ export async function updateTask(id, data) {
       status: data.status ? data.status.toUpperCase() : undefined,
       priority: data.priority ? data.priority.toUpperCase() : undefined,
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-      assigneeId: data.assigneeId
+      assignees: data.assigneeIds
+              ? { set: data.assigneeIds.map(id => ({ id })) }
+              : undefined
     }
   })
 }

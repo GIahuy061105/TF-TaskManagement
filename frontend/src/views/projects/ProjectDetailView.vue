@@ -72,12 +72,15 @@
                       </span>
                     </div>
 
-                    <div
-                      v-if="task.assignee"
-                      class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-[10px] font-bold shrink-0 border border-white shadow-sm"
-                      :title="task.assignee.fullName"
-                    >
-                      {{ task.assignee.fullName.charAt(0).toUpperCase() }}
+                    <div class="flex -space-x-1.5 overflow-hidden">
+                      <div
+                        v-for="user in task.assignees"
+                        :key="user.id"
+                        class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-[10px] font-bold shrink-0 border border-white shadow-sm ring-2 ring-white"
+                        :title="user.fullName"
+                      >
+                        {{ user.fullName.charAt(0).toUpperCase() }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -94,6 +97,7 @@
     >
       <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
+        <!-- Header -->
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <span
             class="text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider"
@@ -105,26 +109,44 @@
           >
             {{ selectedTask.status.replace('_', ' ') }}
           </span>
-          <button @click="closeTaskDetail" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+          <div class="flex items-center gap-4">
+            <button
+              v-if="!isEditing && authStore.isAdmin"
+              @click="isEditing = true"
+              class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition"
+            >
+              ✏️ Chỉnh sửa
+            </button>
+            <button @click="closeTaskDetail" class="text-slate-400 hover:text-slate-600 font-bold text-2xl leading-none">&times;</button>
+          </div>
         </div>
 
+        <!-- Body -->
         <div class="p-6 overflow-y-auto">
-          <h2 class="text-2xl font-bold text-slate-900 mb-4">{{ selectedTask.title }}</h2>
 
-          <div class="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <!-- View mode -->
+          <div v-if="!isEditing" class="space-y-4">
+            <h2 class="text-2xl font-bold text-slate-900">{{ selectedTask.title }}</h2>
+
             <div>
               <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Người thực hiện</p>
-              <div class="flex items-center gap-2" v-if="selectedTask.assignee">
-                <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
-                  {{ selectedTask.assignee.fullName.charAt(0).toUpperCase() }}
+              <div class="flex flex-wrap gap-2" v-if="selectedTask.assignees?.length">
+                <div
+                  v-for="user in selectedTask.assignees"
+                  :key="user.id"
+                  class="flex items-center gap-2 bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100"
+                >
+                  <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-[10px] font-bold">
+                    {{ user.fullName.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="text-xs font-semibold text-slate-700">{{ user.fullName }}</span>
                 </div>
-                <span class="text-sm font-semibold text-slate-700">{{ selectedTask.assignee.fullName }}</span>
               </div>
               <p v-else class="text-sm font-semibold text-slate-400 italic">Chưa giao</p>
             </div>
 
             <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Hạn chót (Due Date)</p>
+              <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Hạn chót</p>
               <p class="text-sm font-semibold text-slate-700">
                 {{ selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString('vi-VN') : 'Không có' }}
               </p>
@@ -150,16 +172,101 @@
                 {{ selectedTask.estimatedMins ? `${selectedTask.estimatedMins} phút` : 'Chưa ước lượng' }}
               </p>
             </div>
-          </div>
 
-          <div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Mô tả chi tiết</p>
-            <div class="text-slate-600 text-sm whitespace-pre-wrap bg-white border border-slate-200 p-4 rounded-xl min-h-[100px]">
-              {{ selectedTask.description || 'Chưa có mô tả cho công việc này.' }}
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Mô tả chi tiết</p>
+              <div class="text-slate-600 text-sm whitespace-pre-wrap bg-white border border-slate-200 p-4 rounded-xl min-h-[100px]">
+                {{ selectedTask.description || 'Chưa có mô tả cho công việc này.' }}
+              </div>
             </div>
           </div>
-        </div>
 
+          <!-- Edit mode -->
+          <form v-else @submit.prevent="handleUpdateTask" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tiêu đề</label>
+              <input v-model="selectedTask.title" type="text" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-semibold text-slate-800" required />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mô tả chi tiết</label>
+              <textarea v-model="selectedTask.description" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm resize-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Trạng thái</label>
+                <select v-model="selectedTask.status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm bg-white">
+                  <option value="TODO">Cần làm</option>
+                  <option value="IN_PROGRESS">Đang làm</option>
+                  <option value="DONE">Hoàn thành</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Độ ưu tiên</label>
+                <select v-model="selectedTask.priority" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm bg-white">
+                  <option value="LOW">Thấp (Low)</option>
+                  <option value="MEDIUM">Trung bình (Medium)</option>
+                  <option value="HIGH">Cao (High)</option>
+                  <option value="URGENT">Khẩn cấp (Urgent)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hạn chót</label>
+                <input v-model="selectedTask.dueDate" type="date" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Thời gian ước tính</label>
+                <div class="relative">
+                  <input
+                    v-model="selectedTask.estimatedMins"
+                    type="number"
+                    placeholder="Ví dụ: 120"
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none transition text-sm pr-12"
+                  />
+                  <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">phút</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Người thực hiện</label>
+              <div class="max-h-32 overflow-y-auto border border-slate-200 rounded-xl p-2 bg-white space-y-1">
+                <label
+                  v-for="member in workspaceStore.members"
+                  :key="member.userId"
+                  class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer transition"
+                >
+                  <input
+                    type="checkbox"
+                    :value="member.userId"
+                    v-model="selectedTask.assigneeIds"
+                    class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                  />
+                  <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                      {{ member.user.fullName.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="text-sm font-semibold text-slate-700">{{ member.user.fullName }}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-slate-100 mt-6">
+              <button type="button" @click="isEditing = false" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition">
+                Hủy
+              </button>
+              <button type="submit" :disabled="loading" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition disabled:opacity-50">
+                {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
+              </button>
+            </div>
+          </form>
+
+        </div>
       </div>
     </div>
     <div
@@ -219,19 +326,26 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Người thực hiện</label>
-              <select
-                v-model="taskForm.assigneeId"
-                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none transition text-sm bg-white"
-              >
-                <option value="">Chưa giao cho ai</option>
-                    <option
-                      v-for="member in workspaceStore.members"
-                      :key="member.userId"
-                      :value="member.userId"
-                    >
-                      {{ member.user.fullName }} ({{ member.user.email }})
-                    </option>
-                </select>
+              <div class="max-h-32 overflow-y-auto border border-slate-200 rounded-xl p-2 bg-white space-y-1">
+                <label
+                  v-for="member in workspaceStore.members"
+                  :key="member.userId"
+                  class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg cursor-pointer transition"
+                >
+                  <input
+                    type="checkbox"
+                    :value="member.userId"
+                    v-model="taskForm.assigneeIds"
+                    class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                  />
+                  <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                      {{ member.user.fullName.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="text-sm font-semibold text-slate-700">{{ member.user.fullName }}</span>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -287,12 +401,13 @@ const selectedTask = ref(null)
 const showModal = ref(false)
 const loading = ref(false)
 const workspaceStore = useWorkspaceStore()
+const isEditing = ref(false)
 const taskForm = ref({
   title: '',
   description: '',
   priority: 'MEDIUM',
   dueDate: '',
-  assigneeId: '',
+  assigneeIds: [],
   estimatedMins: ''
 })
 
@@ -345,13 +460,13 @@ async function handleCreateTask() {
   try {
     const payload = { ...taskForm.value }
     if (!payload.dueDate) delete payload.dueDate
-    if (!payload.assigneeId) delete payload.assigneeId
+    if (!payload.assigneeIds) payload.assigneeIds = []
     if (!payload.estimatedMins) delete payload.estimatedMins
 
     await projectStore.createTask(route.params.id, payload)
 
     showModal.value = false
-    taskForm.value = { title: '', description: '', priority: 'MEDIUM', dueDate: '', assigneeId: '', estimatedMins: '' }
+    taskForm.value = { title: '', description: '', priority: 'MEDIUM', dueDate: '', assigneeIds: [], estimatedMins: '' }
 
     await projectStore.fetchProject(route.params.id)
   } catch (err) {
@@ -361,8 +476,14 @@ async function handleCreateTask() {
   }
 }
 function openTaskDetail(task) {
-  selectedTask.value = JSON.parse(JSON.stringify(task))
+  const clonedTask = JSON.parse(JSON.stringify(task))
+  if (clonedTask.dueDate) {
+      clonedTask.dueDate = clonedTask.dueDate.split('T')[0]
+  }
+  clonedTask.assigneeIds = clonedTask.assignees?.map(user => user.id) || []
+  selectedTask.value = clonedTask
   showDetailModal.value = true
+  isEditing.value = false
 }
 
 function closeTaskDetail() {
@@ -370,5 +491,24 @@ function closeTaskDetail() {
   setTimeout(() => {
     selectedTask.value = null
   }, 200)
+}
+async function handleUpdateTask() {
+  loading.value = true
+  try {
+    const payload = { ...selectedTask.value }
+    if (!payload.dueDate) delete payload.dueDate
+    if (!payload.assigneeIds) payload.assigneeIds = []
+    if (!payload.estimatedMins) payload.estimatedMins = null
+
+    await projectStore.updateTask(payload.id, payload)
+
+    isEditing.value = false
+    await projectStore.fetchProject(route.params.id)
+    showDetailModal.value = false
+  } catch (err) {
+    alert(err.response?.data?.message || 'Lỗi khi cập nhật Task')
+  } finally {
+    loading.value = false
+  }
 }
 </script>

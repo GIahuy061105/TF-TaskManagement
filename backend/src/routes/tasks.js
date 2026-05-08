@@ -3,7 +3,7 @@ import { authorize } from '../middlewares/rbac.js'
 import { updateTask, moveTask, deleteTask, logTime } from '../services/task.service.js'
 
 export async function taskRoutes(app) {
-  app.patch('/tasks/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.patch('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       const task = await updateTask(request.params.id, request.body)
       return reply.send(task)
@@ -12,7 +12,7 @@ export async function taskRoutes(app) {
     }
   })
 
-  app.patch('/tasks/:id/move', { preHandler: authenticate }, async (request, reply) => {
+  app.patch('/tasks/:id/move', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       const task = await moveTask(request.params.id, request.body)
       return reply.send(task)
@@ -21,7 +21,7 @@ export async function taskRoutes(app) {
     }
   })
 
-  app.delete('/tasks/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.delete('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       await deleteTask(request.params.id)
       return reply.code(204).send()

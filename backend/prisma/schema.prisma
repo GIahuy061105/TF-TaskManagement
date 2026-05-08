@@ -80,9 +80,10 @@ model User {
   comments      Comment[]
   notifications Notification[]
 
-  assignedTasks Task[]         @relation("TaskAssignee")
   sentInvitations Invitation[] @relation("InvitationInviter")
   ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
+  tasks Task[] @relation("TaskAssignees")
+
   @@map("users")
 }
 
@@ -147,8 +148,6 @@ model Project {
 model Task {
   id          String   @id @default(uuid())
   projectId   String   @map("project_id")
-  assigneeId  String?  @map("assignee_id")
-  assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
   title       String
   description String?
   status      TaskStatus   @default(TODO)
@@ -167,6 +166,7 @@ model Task {
   project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
   parent    Task?   @relation("SubTasks", fields: [parentId], references: [id])
   subTasks  Task[]  @relation("SubTasks")
+  assignees User[] @relation("TaskAssignees")
   @@map("tasks")
 }
 

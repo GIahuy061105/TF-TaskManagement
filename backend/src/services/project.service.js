@@ -19,6 +19,7 @@ export async function getProjectById(id, workspaceId) {
     include: {
       client: true,
       tasks: {
+        include: { assignees: true },
         orderBy: { position: 'asc' }
       }
     }

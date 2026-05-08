@@ -24,7 +24,7 @@ export async function workspaceRoutes(app) {
   })
 
   // Cập nhật workspace
-  app.patch('/workspace', { preHandler: authenticate }, async (request, reply) => {
+  app.patch('/workspace', { preHandler: [authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id']
       const workspace = await updateWorkspace(workspaceId, request.body)

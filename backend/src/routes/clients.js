@@ -1,4 +1,5 @@
 import { authenticate } from '../middlewares/authenticate.js'
+import { authorize } from '../middlewares/rbac.js'
 import {
   getClients,
   getClientById,
@@ -8,13 +9,13 @@ import {
 } from '../services/client.service.js'
 
 export async function clientRoutes(app) {
-  app.get('/clients', { preHandler: authenticate }, async (request, reply) => {
+  app.get('/clients', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER', 'VIEWER'])] }, async (request, reply) => {
     const workspaceId = request.headers['x-workspace-id'];
     const clients = await getClients(workspaceId)
     return reply.send(clients)
   })
 
-  app.post('/clients', { preHandler: authenticate }, async (request, reply) => {
+  app.post('/clients', { preHandler: [authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const client = await createClient(workspaceId, request.body)
@@ -24,7 +25,7 @@ export async function clientRoutes(app) {
     }
   })
 
-  app.get('/clients/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.get('/clients/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER', 'VIEWER'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const client = await getClientById(request.params.id, workspaceId)
@@ -34,7 +35,7 @@ export async function clientRoutes(app) {
     }
   })
 
-  app.patch('/clients/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.patch('/clients/:id', { preHandler:[authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const client = await updateClient(request.params.id, workspaceId, request.body)
@@ -44,7 +45,7 @@ export async function clientRoutes(app) {
     }
   })
 
-  app.delete('/clients/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.delete('/clients/:id', { preHandler: [authenticate, authorize(['ADMIN'])]}, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       await deleteClient(request.params.id, workspaceId)

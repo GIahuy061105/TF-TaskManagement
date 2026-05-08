@@ -57,6 +57,10 @@ export const useProjectStore = defineStore('project', () => {
       })
       return res.data
   }
+  async function updateTask(taskId , data){
+      const res = await api.patch(`/tasks/${taskId} `,data)
+      return res.data
+  }
 
   return {
     projects,
@@ -69,6 +73,7 @@ export const useProjectStore = defineStore('project', () => {
     fetchProject,
     createProject,
     createTask,
-    moveTask
+    moveTask,
+    updateTask
   }
 })

@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between mb-8">
         <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
         <button
-          v-if="!authStore.isViewer"
+          v-if="authStore.isAdmin"
           @click="showModal = true"
           class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition"
         >

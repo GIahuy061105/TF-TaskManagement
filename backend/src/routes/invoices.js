@@ -17,7 +17,7 @@ export async function invoiceRoutes(app) {
     return reply.send(invoices)
   })
 
-  app.post('/invoices', { preHandler: authenticate }, async (request, reply) => {
+  app.post('/invoices', { preHandler:  [authenticate , authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const invoice = await createInvoice(workspaceId, request.body)
@@ -27,7 +27,7 @@ export async function invoiceRoutes(app) {
     }
   })
 
-  app.get('/invoices/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.get('/invoices/:id', { preHandler:  [authenticate , authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const invoice = await getInvoiceById(request.params.id, workspaceId)
@@ -37,7 +37,7 @@ export async function invoiceRoutes(app) {
     }
   })
 
-  app.patch('/invoices/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.patch('/invoices/:id', { preHandler:  [authenticate , authorize(['ADMIN'])]}, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const invoice = await updateInvoice(request.params.id, workspaceId, request.body)
@@ -47,7 +47,7 @@ export async function invoiceRoutes(app) {
     }
   })
 
-  app.post('/invoices/:id/send', { preHandler: authenticate }, async (request, reply) => {
+  app.post('/invoices/:id/send', { preHandler:  [authenticate , authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const invoice = await sendInvoice(request.params.id, workspaceId)
@@ -57,7 +57,7 @@ export async function invoiceRoutes(app) {
     }
   })
 
-  app.post('/invoices/:id/mark-paid', { preHandler: authenticate }, async (request, reply) => {
+  app.post('/invoices/:id/mark-paid', { preHandler:  [authenticate , authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       const invoice = await markAsPaid(request.params.id, workspaceId)
@@ -67,7 +67,7 @@ export async function invoiceRoutes(app) {
     }
   })
 
-  app.delete('/invoices/:id', { preHandler: authenticate }, async (request, reply) => {
+  app.delete('/invoices/:id', { preHandler:  [authenticate , authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
       await deleteInvoice(request.params.id, workspaceId)
