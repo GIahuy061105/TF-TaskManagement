@@ -38,6 +38,20 @@
             </span>
           </div>
           <h3 class="font-semibold text-slate-800 mb-1">{{ project.name }}</h3>
+          <span
+            v-if="project.visibility === 'PRIVATE'"
+            class="text-[10px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold border border-rose-100 shrink-0"
+            title="Dự án Riêng tư"
+          >
+             🔒 Private
+          </span>
+          <span
+            v-else
+            class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-100 shrink-0"
+            title="Dự án Công khai"
+            >
+             🌍 Public
+          </span>
           <p class="text-xs text-slate-400 mb-3">{{ project._count?.tasks || 0 }} tasks</p>
           <div class="flex items-center gap-3 text-xs text-slate-400">
             <span v-if="project.client">👤 {{ project.client.name }}</span>
@@ -71,6 +85,7 @@
               />
             </div>
 
+
             <div class="flex-1">
               <label class="block text-sm font-medium text-slate-700 mb-1">Màu sắc</label>
               <div class="flex items-center gap-2">
@@ -89,18 +104,28 @@
             </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Client</label>
-            <select v-model="form.clientId" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm transition">
-              <option value="">Không có</option>
-              <option v-for="client in clientStore.clients" :key="client.id" :value="client.id">{{ client.name }}</option>
-            </select>
+          <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Quyền truy cập</label>
+                <select v-model="form.visibility" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm transition font-medium">
+                   <option value="PUBLIC">🌍 Công khai (Cả team)</option>
+                   <option value="PRIVATE">🔒 Riêng tư (Chỉ người được mời)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Khách hàng</label>
+                <select v-model="form.clientId" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm transition">
+                  <option value="">Không có</option>
+                  <option v-for="client in clientStore.clients" :key="client.id" :value="client.id">{{ client.name }}</option>
+                </select>
+              </div>
           </div>
 
           <div class="flex gap-4">
             <div class="flex-1">
               <label class="block text-sm font-medium text-slate-700 mb-1">Giá theo giờ ($)</label>
-              <input v-model="form.hourlyRate" type="number" placeholder="25" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm transition" />
+              <input v-model="form.hourlyRate" type="number" min="0" step="0.1" placeholder="25" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 text-sm transition" />
             </div>
             <div class="flex-1">
               <label class="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
@@ -135,7 +160,7 @@ const clientStore = useClientStore()
 const authStore = useAuthStore()
 const showModal = ref(false)
 const loading = ref(false)
-const form = ref({ name: '', clientId: '', hourlyRate: '', deadline: '',color: '#6366f1', icon: '📁', description: '' })
+const form = ref({ name: '', clientId: '', hourlyRate: '', deadline: '',color: '#6366f1', icon: '📁', description: '',visibility: 'PUBLIC' })
 
 onMounted(() => {
   projectStore.fetchProjects()
@@ -147,7 +172,7 @@ async function handleCreate() {
   try {
     await projectStore.createProject(form.value)
     showModal.value = false
-    form.value = { name: '', clientId: '', hourlyRate: '', deadline: '' }
+    form.value = { name: '', clientId: '', hourlyRate: '', deadline: '', color: '#6366f1', icon: '📁', description: '', visibility: 'PUBLIC' }
   } finally {
     loading.value = false
   }

@@ -1,6 +1,6 @@
 import { authenticate } from '../middlewares/authenticate.js'
 import { authorize } from '../middlewares/rbac.js'
-import { updateTask, moveTask, deleteTask, logTime } from '../services/task.service.js'
+import { updateTask, moveTask, deleteTask, logTime , requestTaskApprove , approveTask } from '../services/task.service.js'
 
 export async function taskRoutes(app) {
   app.patch('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
@@ -35,6 +35,23 @@ export async function taskRoutes(app) {
       const { userId } = request.user
       const log = await logTime(request.params.id, userId, request.body)
       return reply.code(201).send(log)
+    } catch (err) {
+      reply.code(400).send({ message: err.message })
+    }
+  })
+  app.post('/tasks/:id/request-approval', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
+    try{
+      const task = await requestTaskApprove(request.params.id)
+      return reply.send(task)
+    } catch (err) {
+      reply.code(400).send({ message: err.message })
+    }
+  })
+
+  app.post('/tasks/:id/approve', { preHandler: [authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
+    try{
+      const task = await approveTask(request.params.id)
+      return reply.send(task)
     } catch (err) {
       reply.code(400).send({ message: err.message })
     }

@@ -5,11 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87d0053e-3a9e-4fbb-9672-622d627a09ad" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/project/CreateTaskModal.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/project/KanbanBoard.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/project/ProjectHeader.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/project/TaskCard.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/project/TaskDetailModal.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/middlewares/rbac.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/middlewares/rbac.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/routes/projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/projects.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/tasks.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/tasks.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/invitation.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/invitation.service.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/services/project.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/project.service.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/services/task.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/task.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/workspace.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/workspace.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/stores/project.store.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/stores/project.store.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" afterDir="false" />

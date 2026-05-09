@@ -30,8 +30,7 @@ export async function createTask(projectId, data) {
         estimatedMins: data.estimatedMins ? parseInt(data.estimatedMins) : null,
 
         assignees: (data.assigneeIds && data.assigneeIds.length > 0)
-          ? { connect: data.assigneeIds.map(id => ({ id })) }
-          : undefined
+          ? {create: data.assigneeIds.map(id => ({user: { connect: { id } } }))}: undefined
       }
     })
   }
@@ -45,8 +44,7 @@ export async function updateTask(id, data) {
       priority: data.priority ? data.priority.toUpperCase() : undefined,
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
       assignees: data.assigneeIds
-              ? { set: data.assigneeIds.map(id => ({ id })) }
-              : undefined
+        ? {deleteMany: {}, create: data.assigneeIds.map(id => ({user: { connect: { id } }}))}: undefined
     }
   })
 }
@@ -74,5 +72,18 @@ export async function logTime(taskId, userId, data) {
       note: data.note || null,
       loggedOn: data.loggedOn ? new Date(data.loggedOn) : new Date()
     }
+  })
+}
+export async function requestTaskApprove(id) {
+  return prisma.task.update({
+    where: { id },
+    data: { isPendingApproval: true }
+  })
+}
+
+export async function approveTask(id) {
+  return prisma.task.update({
+    where: { id },
+    data: { isPendingApproval: false, status: 'DONE' }
   })
 }

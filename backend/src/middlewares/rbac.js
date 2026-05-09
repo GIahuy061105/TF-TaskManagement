@@ -10,7 +10,7 @@ export function authorize(allowedRoles) {
       return reply.code(400).send({ message: 'Thiếu Workspace ID trong header' })
     }
 
-    const membership = await prisma.member.findUnique({
+    const membership = await prisma.workspaceMember.findUnique({
       where: {
         workspaceId_userId: { workspaceId, userId }
       }

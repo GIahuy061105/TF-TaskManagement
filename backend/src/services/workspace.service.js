@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export async function getWorkspaceMembers(workspaceId) {
-  return prisma.member.findMany({
+  return prisma.workspaceMember.findMany({
     where: { workspaceId },
     include: {
       user: {
@@ -23,7 +23,7 @@ export async function addMember(workspaceId, { email, role }) {
   const user = await prisma.user.findUnique({ where: { email } })
   if (!user) throw new Error('Người dùng này chưa có tài khoản hệ thống')
 
-  const existingMember = await prisma.member.findUnique({
+  const existingMember = await prisma.workspaceMember.findUnique({
     where: {
       workspaceId_userId: {
         workspaceId: workspaceId,
@@ -36,7 +36,7 @@ export async function addMember(workspaceId, { email, role }) {
     throw new Error('Người dùng này đã là thành viên của workspace')
   }
 
-  return prisma.member.create({
+  return prisma.workspaceMember.create({
     data: {
       workspaceId,
       userId: user.id,
@@ -58,7 +58,7 @@ export async function updateWorkspace(id, data) {
 }
 
 export async function removeMember(workspaceId, userId) {
-  return prisma.member.delete({
+  return prisma.workspaceMember.delete({
     where: {
       workspaceId_userId: { workspaceId, userId }
     }

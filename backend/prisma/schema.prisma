@@ -65,6 +65,10 @@ enum NotificationType {
   WORKSPACE_INVITE
   SYSTEM_ALERT
 }
+enum ProjectVisibility {
+  PUBLIC
+  PRIVATE
+}
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -72,7 +76,7 @@ model User {
   fullName     String    @map("full_name")
   avatarUrl    String?   @map("avatar_url")
   createdAt    DateTime  @default(now()) @map("created_at")
-  memberships     Member[]
+  memberships     WorkspaceMember[]
   timeLogs        TimeLog[]
   timezone    String   @default("Asia/Ho_Chi_Minh")
   language    String   @default("vi")
@@ -82,8 +86,8 @@ model User {
 
   sentInvitations Invitation[] @relation("InvitationInviter")
   ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
-  tasks Task[] @relation("TaskAssignees")
-
+  assignedTasks TaskAssignee[]
+  joinedProjects ProjectMember[]
   @@map("users")
 }
 
@@ -100,7 +104,7 @@ model Workspace {
   clients  Client[]
   projects Project[]
   invoices Invoice[]
-  members   Member[]
+  members   WorkspaceMember[]
   invitations Invitation[]
   notifications Notification[]
   description String?
@@ -139,6 +143,8 @@ model Project {
   color       String?  @default("#6366f1")
   icon        String?  @default("📁")
   description String?
+  visibility  ProjectVisibility @default(PUBLIC)
+  members     ProjectMember[]
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
   client    Client?   @relation(fields: [clientId], references: [id],onDelete : Cascade)
@@ -159,6 +165,7 @@ model Task {
   estimatedMins Int?      @map("estimated_mins")
   completedAt   DateTime? @map("completed_at")
   tags          String[]  @default([])
+  isPendingApproval Boolean @default(false)
   attachments   Json?
   comments  Comment[]
   timeLogs TimeLog[]
@@ -166,7 +173,7 @@ model Task {
   project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
   parent    Task?   @relation("SubTasks", fields: [parentId], references: [id])
   subTasks  Task[]  @relation("SubTasks")
-  assignees User[] @relation("TaskAssignees")
+  assignees TaskAssignee[]
   @@map("tasks")
 }
 
@@ -179,9 +186,8 @@ model TimeLog {
   loggedOn  DateTime @map("logged_on")
   createdAt DateTime @default(now()) @map("created_at")
 
-  task Task @relation(fields: [taskId], references: [id])
-  user User @relation(fields: [userId], references: [id])
-
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@map("time_logs")
 }
 
@@ -203,10 +209,10 @@ model Invoice {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete: Cascade)
   client    Client    @relation(fields: [clientId], references: [id],onDelete: Cascade)
-
+  @@unique([workspaceId, invoiceNumber])
   @@map("invoices")
 }
-model Member {
+model WorkspaceMember {
   id          String   @id @default(uuid())
   workspaceId String   @map("workspace_id")
   userId      String   @map("user_id")
@@ -218,6 +224,17 @@ model Member {
 
   @@unique([workspaceId, userId]) // Một người chỉ có 1 role trong 1 workspace
   @@map("members")
+}
+model ProjectMember {
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+  @@map("project_members")
 }
 model Invitation {
   id          String   @id @default(uuid())
@@ -233,7 +250,6 @@ model Invitation {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   inviter     User      @relation("InvitationInviter", fields: [invitedBy], references: [id])
 
-  @@unique([workspaceId, email])
   @@map("invitations")
 }
 model Comment {
@@ -265,4 +281,15 @@ model Notification {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+model TaskAssignee {
+  taskId     String   @map("task_id")
+  userId     String   @map("user_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@map("task_assignees")
 }

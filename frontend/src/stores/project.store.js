@@ -61,6 +61,40 @@ export const useProjectStore = defineStore('project', () => {
       const res = await api.patch(`/tasks/${taskId} `,data)
       return res.data
   }
+  // Gửi đơn yêu cầu duyệt hoàn thành
+  async function requestTaskApprove(taskId , data){
+      const res = await api.post(`/tasks/${taskId}/request-approval` , data)
+      return res.data
+  }
+  // Phê duyệt hoàn thành task
+  async function approveTask(taskId) {
+      const res = await api.post(`/tasks/${taskId}/approve`)
+      return res.data
+  }
+  //  Cập nhật dự án (Trạng thái)
+  async function updateProject(projectId, data) {
+      await api.patch(`/projects/${projectId}`, data)
+  }
+
+  //  Xóa dự án
+  async function deleteProject(projectId) {
+      await api.delete(`/projects/${projectId}`)
+  }
+
+  //  Thêm thành viên vào dự án
+  async function addProjectMember(projectId, userId) {
+      await api.post(`/projects/${projectId}/members`, { userId })
+  }
+
+  //  Xóa thành viên khỏi dự án
+  async function removeProjectMember(projectId, userId) {
+      await api.delete(`/projects/${projectId}/members/${userId}`)
+  }
+
+  //  Xóa Task
+  async function deleteTask(taskId) {
+      await api.delete(`/tasks/${taskId}`)
+  }
 
   return {
     projects,
@@ -74,6 +108,13 @@ export const useProjectStore = defineStore('project', () => {
     createProject,
     createTask,
     moveTask,
-    updateTask
+    updateTask,
+    requestTaskApprove,
+    approveTask,
+    updateProject,
+    deleteProject,
+    addProjectMember,
+    removeProjectMember,
+    deleteTask
   }
 })

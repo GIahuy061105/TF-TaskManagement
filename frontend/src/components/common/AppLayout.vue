@@ -53,10 +53,14 @@
               </div>
 
               <div>
-                <label class="text-[10px] font-bold text-slate-400 uppercase">Vai trò mặc định</label>
-                <div class="mt-1 px-3 py-2 bg-slate-100 text-slate-600 text-sm rounded-lg font-medium">
-                  MEMBER (Thành viên)
-                </div>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Vai trò</label>
+                <select
+                  v-model="inviteRole"
+                  class="mt-1 px-3 py-2 bg-slate-100 text-slate-600 text-sm rounded-lg font-medium"
+                >
+                  <option value="MEMBER"> MEMBER (Thành viên) </option>
+                  <option value="VIEWER"> VIEWER (Người xem) </option>
+                  </select>
               </div>
 
               <div class="flex gap-3 pt-2">
@@ -214,6 +218,7 @@ const navItems = [
 ]
 const showInviteForm = ref(false)
 const inviteEmail = ref('')
+const inviteRole = ref('MEMBER')
 const isSending = ref(false)
 onMounted(async () => {
   try {
@@ -264,10 +269,11 @@ async function handleSendInvite() {
   try {
     await api.post('/workspace/invite', {
       email: inviteEmail.value,
-      role: 'MEMBER'
+      role: inviteRole.value
     })
     alert('Đã gửi lời mời thành công!')
     inviteEmail.value = ''
+    inviteRole.value = 'MEMBER'
     showInviteForm.value = false
   } catch (err) {
     alert(err.response?.data?.message || 'Không thể gửi lời mời')

@@ -9,7 +9,7 @@ export async function inviteMember(workspaceId, invitedBy, { email, role }) {
   if (!existingUser) {
     throw new Error('Email này chưa đăng ký tài khoản TaskFlow. Không thể gửi lời mời.')
   }
-  const existingMember = await prisma.member.findUnique({
+  const existingMember = await prisma.workspaceMember.findUnique({
       where: { workspaceId_userId: { workspaceId, userId: existingUser.id } }
     })
   if (existingMember) throw new Error('Người này đã là thành viên rồi')
@@ -19,7 +19,7 @@ export async function inviteMember(workspaceId, invitedBy, { email, role }) {
 
   // Kiểm tra invitation pending chưa
   const existingInvite = await prisma.invitation.findFirst({
-    where: { workspaceId, email, status: 'PENDING' }
+    where: { workspaceId, email: email, status: 'PENDING' }
   })
   if (existingInvite) throw new Error('Đã gửi lời mời cho email này rồi')
 
@@ -73,7 +73,7 @@ export async function acceptInvitation(token, userId) {
     }
 
 
-  await prisma.member.create({
+  await prisma.workspaceMember.create({
     data: {
       workspaceId: invitation.workspaceId,
       userId,

@@ -5,21 +5,26 @@ import {
   getProjectById,
   createProject,
   updateProject,
-  deleteProject
+  deleteProject,
+  addMemberToProject,
+  removeMemberFromProject
 } from '../services/project.service.js'
 import { getTasksByProject, createTask } from '../services/task.service.js'
 
 export async function projectRoutes(app) {
   app.get('/projects', { preHandler: [authenticate,authorize(['ADMIN', 'MEMBER' ,'VIEWER'])] }, async (request, reply) => {
     const workspaceId = request.headers['x-workspace-id'];
-    const projects = await getProjects(workspaceId)
+    const userId = request.user.userId || request.user.id;
+    const userRole = request.user.role;
+    const projects = await getProjects(workspaceId, userId, userRole);
     return reply.send(projects)
   })
 
   app.post('/projects', { preHandler: [authenticate,authorize(['ADMIN'])]}, async (request, reply) => {
     try {
       const workspaceId = request.headers['x-workspace-id'];
-      const project = await createProject(workspaceId, request.body)
+      const userId = request.user.userId || request.user.id;
+      const project = await createProject(workspaceId, request.body , userId )
       return reply.code(201).send(project)
     } catch (err) {
       reply.code(400).send({ message: err.message })
@@ -68,5 +73,25 @@ export async function projectRoutes(app) {
     } catch (err) {
       reply.code(400).send({ message: err.message })
     }
+  })
+  app.post('/projects/:id/members',{ preHandler: [authenticate,authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
+    try{
+      const { userId } = request.body
+      if(!userId){
+        return reply.code(400).send({ message: 'Vui lòng chọn một thành viên để thêm' });
+      }
+      const projectMember = await addMemberToProject(request.params.id, userId);
+        return reply.code(201).send(projectMember);
+      } catch (err) {
+        reply.code(400).send({ message: err.message });
+      }
+  })
+  app.delete('/projects/:id/members/:userId', { preHandler: [authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
+      try {
+        await removeMemberFromProject(request.params.id, request.params.userId)
+        return reply.code(204).send()
+      } catch (err) {
+        reply.code(400).send({ message: err.message })
+      }
   })
 }
