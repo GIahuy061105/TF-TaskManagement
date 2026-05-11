@@ -1,52 +1,62 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-    <div class="w-full max-w-md">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">TaskFlow</h1>
-        <p class="text-gray-500 mt-2">Đăng nhập vào tài khoản</p>
+  <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md relative z-10">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white text-3xl shadow-xl shadow-indigo-200 mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300 cursor-default">
+          ⚡
+        </div>
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">TaskFlow</h1>
+        <p class="text-slate-500 font-medium">Chào mừng trở lại! Vui lòng đăng nhập.</p>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <form @submit.prevent="handleLogin" class="space-y-5">
+      <div class="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-2xl shadow-indigo-50/50 border border-white p-8 sm:p-10">
+        <form @submit.prevent="handleLogin" class="space-y-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Email</label>
             <input
               v-model="form.email"
               type="email"
               placeholder="huy@example.com"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition text-sm"
+              class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Mật khẩu</label>
             <input
               v-model="form.password"
               type="password"
               placeholder="••••••••"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition text-sm"
+              class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800"
               required
             />
           </div>
 
-          <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
+          <p v-if="error" class="text-rose-500 text-sm font-bold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex items-center gap-2">
+            <span>⚠️</span> {{ error }}
+          </p>
 
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition disabled:opacity-50"
+            class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
           >
-            {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+            {{ loading ? 'Đang xác thực...' : 'Đăng nhập' }}
           </button>
         </form>
 
-        <p class="text-center text-sm text-gray-500 mt-6">
-          Chưa có tài khoản?
-          <RouterLink to="/register" class="text-indigo-600 font-medium hover:underline">
-            Đăng ký ngay
-          </RouterLink>
-        </p>
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p class="text-sm text-slate-500 font-medium">
+            Chưa có tài khoản?
+            <RouterLink to="/register" class="text-indigo-600 font-bold hover:text-indigo-700 transition ml-1 hover:underline">
+              Đăng ký ngay
+            </RouterLink>
+          </p>
+        </div>
       </div>
     </div>
   </div>

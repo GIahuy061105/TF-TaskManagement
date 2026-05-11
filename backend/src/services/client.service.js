@@ -31,8 +31,12 @@ export async function createClient(workspaceId, data) {
       name: data.name,
       email: data.email || null,
       company: data.company || null,
-      currency: data.currency || 'USD'
-    }
+      phone: data.phone || null,
+      address: data.address || null,
+      taxCode: data.taxCode || null,
+      personalId: data.personalId || null,
+      currency: data.currency || 'VND' // Mặc định ở VN là VND
+      }
   })
 }
 
@@ -43,10 +47,14 @@ export async function updateClient(id, workspaceId, data) {
   return prisma.client.update({
     where: { id },
     data: {
-      name: data.name,
-      email: data.email,
-      company: data.company || null,
-      currency: data.currency || 'USD'
+        name: data.name,
+        email: data.email || null,
+        company: data.company || null,
+        phone: data.phone || null,
+        address: data.address || null,
+        taxCode: data.taxCode || null,
+        personalId: data.personalId || null,
+        currency: data.currency || 'VND'
     }
   })
 }

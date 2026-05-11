@@ -9,10 +9,20 @@ export const useInvoiceStore = defineStore('invoice', () => {
     const res = await api.get('/invoices')
     invoices.value = res.data
   }
+  async function fetchInvoiceById(){
+    const res = await api.get(`/invoices/${id}`)
+    invoices.value = res.data
+  }
 
   async function createInvoice(data) {
     const res = await api.post('/invoices', data)
     invoices.value.unshift(res.data)
+    return res.data
+  }
+  async function updateInvoice(data){
+    const res = await api.patch(`/invoices/${id}` , data)
+    const index = invoices.value.findIndex(i => i.id === id)
+    if (index !== -1) invoices.value[index] = res.data
     return res.data
   }
 
@@ -35,5 +45,5 @@ export const useInvoiceStore = defineStore('invoice', () => {
     invoices.value = invoices.value.filter(i => i.id !== id)
   }
 
-  return { invoices, fetchInvoices, createInvoice, sendInvoice, markAsPaid, deleteInvoice }
+  return { invoices, fetchInvoices, fetchInvoiceById, createInvoice, updateInvoice ,sendInvoice, markAsPaid, deleteInvoice }
 })

@@ -1,7 +1,7 @@
 import { authenticate } from '../middlewares/authenticate.js'
 import { authorize } from '../middlewares/rbac.js'
 import { updateTask, moveTask, deleteTask, logTime , requestTaskApprove , approveTask } from '../services/task.service.js'
-
+import { getCommentsByTask, createComment } from '../services/comment.service.js'
 export async function taskRoutes(app) {
   app.patch('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
@@ -52,6 +52,28 @@ export async function taskRoutes(app) {
     try{
       const task = await approveTask(request.params.id)
       return reply.send(task)
+    } catch (err) {
+      reply.code(400).send({ message: err.message })
+    }
+  })
+  app.get('/tasks/:id/comments', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER', 'VIEWER'])] }, async (request, reply) => {
+    try {
+      const comments = await getCommentsByTask(request.params.id)
+      return reply.send(comments)
+    } catch (err) {
+      reply.code(404).send({ message: err.message })
+    }
+  })
+  app.post('/tasks/:id/comments', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
+    try {
+      const taskId = request.params.id
+      const userId = request.user.userId || request.user.id
+      const { content } = request.body
+    if (!content || content.trim() === '') {
+      throw new Error('Nội dung bình luận không được để trống')
+    }
+      const comment = await createComment(taskId, userId, content)
+      return reply.code(201).send(comment)
     } catch (err) {
       reply.code(400).send({ message: err.message })
     }

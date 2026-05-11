@@ -210,12 +210,15 @@ const router = useRouter()
 const authStore = useAuthStore()
 const invitations = ref([])
 const showInviteModal = ref(false)
-const navItems = [
-  { to: '/dashboard', icon: '⊞', label: 'Dashboard' },
-  { to: '/projects', icon: '◫', label: 'Projects' },
-  { to: '/clients', icon: '◎', label: 'Clients' },
-  { to: '/invoices', icon: '≡', label: 'Invoices' }
-]
+const navItems = computed(() => {
+  const allItems = [
+    { to: '/dashboard', icon: '⊞', label: 'Dashboard' },
+    { to: '/projects', icon: '◫', label: 'Projects' },
+    { to: '/clients', icon: '◎', label: 'Clients' },
+    { to: '/invoices', icon: '≡', label: 'Invoices', adminOnly: true }
+  ]
+  return allItems.filter(item => !item.adminOnly || authStore.isAdmin)
+})
 const showInviteForm = ref(false)
 const inviteEmail = ref('')
 const inviteRole = ref('MEMBER')

@@ -1,14 +1,16 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div
       v-for="column in columns"
       :key="column.status"
-      class="bg-slate-50 rounded-2xl border border-slate-200 p-4"
+      class="bg-slate-50/50 rounded-3xl border border-slate-100 p-5 flex flex-col"
     >
-      <div class="flex items-center gap-2 mb-4">
-        <span class="w-2.5 h-2.5 rounded-full" :class="column.color"></span>
-        <h3 class="font-bold text-slate-700">{{ column.label }}</h3>
-        <span class="ml-auto text-xs font-bold text-slate-400 bg-white px-2 py-0.5 rounded-full shadow-sm border border-slate-100">
+      <div class="flex items-center justify-between mb-5 px-1">
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full shadow-sm" :class="column.color"></span>
+          <h3 class="font-black text-slate-800 tracking-tight">{{ column.label }}</h3>
+        </div>
+        <span class="text-xs font-black text-slate-500 bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100">
           {{ taskColumns[column.status].length }}
         </span>
       </div>
@@ -18,8 +20,9 @@
         :disabled="!isAdmin"
         group="tasks"
         item-key="id"
-        class="space-y-3 min-h-[150px]"
+        class="space-y-4 min-h-[200px] flex-1 custom-scrollbar"
         @change="(evt) => onChange(evt, column.status)"
+        ghost-class="opacity-50"
       >
         <template #item="{ element: task }">
           <TaskCard :task="task" @click="$emit('open-task', task)" />

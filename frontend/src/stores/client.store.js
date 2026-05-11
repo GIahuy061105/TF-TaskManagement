@@ -10,6 +10,11 @@ export const useClientStore = defineStore('clients', () => {
     const res = await api.get('/clients')
     clients.value = res.data
   }
+  async function fetchClientById(id) {
+      const res = await api.get(`/clients/${id}`)
+      currentClient.value = res.data
+      return res.data
+  }
 
   async function createClient(data) {
     const res = await api.post('/clients', data)
@@ -29,5 +34,5 @@ export const useClientStore = defineStore('clients', () => {
     clients.value = clients.value.filter(c => c.id !== id)
   }
 
-  return { clients, currentClient, fetchClients, createClient, updateClient, deleteClient }
+  return { clients, currentClient, fetchClients ,fetchClientById, createClient, updateClient, deleteClient }
 })

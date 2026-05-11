@@ -1,48 +1,57 @@
 <template>
-<div v-if="showMemberModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 backdrop-blur-sm" @click.self="showMemberModal = false">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-bold text-slate-900">Quản lý thành viên dự án</h3>
-          <button @click="showMemberModal = false" class="text-2xl text-slate-400 hover:text-slate-600">&times;</button>
-        </div>
+  <div v-if="showMemberModal" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 px-4 backdrop-blur-sm" @click.self="showMemberModal = false">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-black text-slate-900">Thành viên Dự án</h3>
+        <button @click="showMemberModal = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl transition">&times;</button>
+      </div>
 
-        <div class="space-y-3 max-h-60 overflow-y-auto mb-6 pr-2">
-          <div v-for="pm in project?.members" :key="pm.userId" class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
-                {{ pm.user?.fullName?.charAt(0).toUpperCase() }}
-              </div>
-              <div>
-                <p class="text-sm font-bold text-slate-800">{{ pm.user?.fullName }}</p>
-                <p class="text-[10px] text-slate-500">{{ pm.user?.email }}</p>
-              </div>
+      <div class="space-y-3 max-h-60 overflow-y-auto mb-6 pr-2 custom-scrollbar">
+        <div v-for="pm in project?.members" :key="pm.userId" class="group flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-100 transition-colors">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-white border border-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-sm">
+              {{ pm.user?.fullName?.charAt(0).toUpperCase() }}
             </div>
-            <button @click="handleRemoveMember(pm.userId)" class="text-red-500 text-xs font-bold hover:bg-red-50 px-2 py-1 rounded">Xóa</button>
+            <div>
+              <p class="text-sm font-bold text-slate-800">{{ pm.user?.fullName }}</p>
+              <p class="text-[10px] font-medium text-slate-400">{{ pm.user?.email }}</p>
+            </div>
           </div>
-          <p v-if="!project?.members?.length" class="text-center text-sm text-slate-400 italic">Dự án này chưa có thành viên nào.</p>
+          <button @click="handleRemoveMember(pm.userId)" class="opacity-0 group-hover:opacity-100 text-rose-500 text-xs font-bold hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-rose-100">
+            Gỡ
+          </button>
         </div>
 
-        <div v-if="authStore.isAdmin" class="pt-4 border-t border-slate-100">
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Thêm từ Workspace</label>
-          <div class="flex gap-2">
-            <select v-model="selectedUserIdToAdd" class="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-indigo-500">
-              <option value="" disabled>-- Chọn người --</option>
-              <option v-for="user in availableUsersToAdd" :key="user.userId" :value="user.userId">
-                {{ user.user.fullName }}
-              </option>
-            </select>
-            <button @click="handleAddMember" :disabled="!selectedUserIdToAdd || loading" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">
-              Thêm
-            </button>
-          </div>
+        <div v-if="!project?.members?.length" class="text-center py-6 border-2 border-dashed border-slate-100 rounded-2xl">
+          <p class="text-sm font-semibold text-slate-400">Dự án này chưa có ai tham gia.</p>
+        </div>
+      </div>
+
+      <div v-if="authStore.isAdmin" class="pt-6 border-t border-slate-100">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Thêm từ Workspace</label>
+        <div class="flex gap-2">
+          <select v-model="selectedUserIdToAdd" class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 font-medium text-slate-700 transition">
+            <option value="" disabled>-- Chọn nhân sự --</option>
+            <option v-for="user in availableUsersToAdd" :key="user.userId" :value="user.userId">
+              {{ user.user.fullName }}
+            </option>
+          </select>
+          <button @click="handleAddMember" :disabled="!selectedUserIdToAdd || loading" class="bg-indigo-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-md transition">
+            Thêm
+          </button>
         </div>
       </div>
     </div>
-  <AppLayout>
-    <div class="p-8">
-      <div v-if="!project" class="text-center py-20 text-gray-400">Đang tải...</div>
+  </div>
 
-      <div v-else>
+  <AppLayout>
+    <div class="p-8 max-w-[1600px] mx-auto h-full flex flex-col">
+      <div v-if="!project" class="flex flex-col items-center justify-center flex-1 text-slate-400 gap-4">
+        <div class="animate-spin text-4xl">⏳</div>
+        <p class="font-semibold tracking-wider">Đang tải dữ liệu dự án...</p>
+      </div>
+
+      <div v-else class="flex-1 flex flex-col">
         <ProjectHeader
           :project="project"
           :members="workspaceStore.members"
@@ -55,17 +64,18 @@
           @manage-members="showMemberModal = true"
         />
 
-        <KanbanBoard
-          :tasks="project.tasks || []"
-          :is-admin="authStore.isAdmin"
-          @open-task="openTaskDetail"
-          @move-task="handleMoveTask"
-          @refresh="refreshProject"
-        />
+        <div class="flex-1 mt-6">
+          <KanbanBoard
+            :tasks="project.tasks || []"
+            :is-admin="authStore.isAdmin"
+            @open-task="openTaskDetail"
+            @move-task="handleMoveTask"
+            @refresh="refreshProject"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- Task Detail Modal -->
     <TaskDetailModal
       v-if="showDetailModal && selectedTask"
       :task="selectedTask"
@@ -79,7 +89,6 @@
       @approve-task="handleApproveTask"
     />
 
-    <!-- Create Task Modal -->
     <CreateTaskModal
       v-if="showModal"
       :members="workspaceStore.members"

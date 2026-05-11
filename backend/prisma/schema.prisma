@@ -120,7 +120,11 @@ model Client {
   name        String
   email       String?
   company     String?
-  currency    String   @default("USD")
+  phone       String?
+  address     String?
+  taxCode     String?  @map("tax_code")
+  personalId  String?  @map("personal_id")
+  currency    String   @default("VND")
   createdAt   DateTime @default(now()) @map("created_at")
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
@@ -145,6 +149,7 @@ model Project {
   description String?
   visibility  ProjectVisibility @default(PUBLIC)
   members     ProjectMember[]
+  invoices    Invoice[]
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete : Cascade)
   client    Client?   @relation(fields: [clientId], references: [id],onDelete : Cascade)
@@ -195,20 +200,30 @@ model Invoice {
   id            String   @id @default(uuid())
   workspaceId   String   @map("workspace_id")
   clientId      String   @map("client_id")
+  projectId     String?   @map("project_id")
+
+  formSymbol    String?  @map("form_symbol")
+  invoiceSymbol String?  @map("invoice_symbol")
   invoiceNumber String   @map("invoice_number")
+
   status        InvoiceStatus   @default(DRAFT)
+  paymentMethod String   @default("CK") @map("payment_method")
   lineItems     Json     @map("line_items")
   subtotal      Decimal
   taxRate       Decimal  @default(0) @map("tax_rate")
+  taxAmount     Decimal  @default(0) @map("tax_amount")
   total         Decimal
   dueDate       DateTime? @map("due_date")
   pdfUrl        String?  @map("pdf_url")
+  notes         String?
+  terms         String?
   sentAt        DateTime? @map("sent_at")
   paidAt        DateTime? @map("paid_at")
   createdAt     DateTime @default(now()) @map("created_at")
 
   workspace Workspace @relation(fields: [workspaceId], references: [id],onDelete: Cascade)
   client    Client    @relation(fields: [clientId], references: [id],onDelete: Cascade)
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   @@unique([workspaceId, invoiceNumber])
   @@map("invoices")
 }

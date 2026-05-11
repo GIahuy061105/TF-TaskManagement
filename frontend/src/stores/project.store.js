@@ -95,6 +95,15 @@ export const useProjectStore = defineStore('project', () => {
   async function deleteTask(taskId) {
       await api.delete(`/tasks/${taskId}`)
   }
+  async function fetchComments(taskId) {
+    const res = await api.get(`/tasks/${taskId}/comments`)
+    return res.data
+  }
+
+  async function addComment(taskId, content) {
+    const res = await api.post(`/tasks/${taskId}/comments`, { content })
+    return res.data
+  }
 
   return {
     projects,
@@ -111,6 +120,8 @@ export const useProjectStore = defineStore('project', () => {
     updateTask,
     requestTaskApprove,
     approveTask,
+    fetchComments,
+    addComment,
     updateProject,
     deleteProject,
     addProjectMember,
