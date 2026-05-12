@@ -87,6 +87,7 @@ model User {
   sentInvitations Invitation[] @relation("InvitationInviter")
   ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
   assignedTasks TaskAssignee[]
+  attachments   Attachment[]
   joinedProjects ProjectMember[]
   @@map("users")
 }
@@ -171,7 +172,7 @@ model Task {
   completedAt   DateTime? @map("completed_at")
   tags          String[]  @default([])
   isPendingApproval Boolean @default(false)
-  attachments   Json?
+  attachments   Attachment[]
   comments  Comment[]
   timeLogs TimeLog[]
 
@@ -307,4 +308,16 @@ model TaskAssignee {
 
   @@id([taskId, userId])
   @@map("task_assignees")
+}
+model Attachment {
+  id        String   @id @default(uuid())
+  fileName  String
+  fileUrl   String
+  fileSize  Int?
+  fileType  String?
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }

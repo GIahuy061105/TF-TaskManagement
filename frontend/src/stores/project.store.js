@@ -104,7 +104,19 @@ export const useProjectStore = defineStore('project', () => {
     const res = await api.post(`/tasks/${taskId}/comments`, { content })
     return res.data
   }
+  async function fetchAttachments(taskId) {
+    const res = await api.get(`/tasks/${taskId}/attachments`)
+    return res.data
+  }
 
+  async function addAttachment(taskId, attachmentData) {
+    const res = await api.post(`/tasks/${taskId}/attachments`, attachmentData)
+    return res.data
+  }
+
+  async function deleteAttachment(taskId, attachmentId) {
+    await api.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
+  }
   return {
     projects,
     currentProject,
@@ -122,6 +134,9 @@ export const useProjectStore = defineStore('project', () => {
     approveTask,
     fetchComments,
     addComment,
+    fetchAttachments,
+    addAttachment,
+    deleteAttachment,
     updateProject,
     deleteProject,
     addProjectMember,

@@ -90,6 +90,40 @@
               {{ task.description || 'Chưa có mô tả chi tiết cho công việc này.' }}
             </div>
           </div>
+          <div class="mt-8">
+            <h4 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider flex items-center gap-2">
+            <span class="text-indigo-500 text-lg">📎</span> Tài liệu đính kèm ({{ attachments.length }})
+              </h4>
+                <div v-if="!authStore.isViewer"
+                  @dragover.prevent="isDragging = true"
+                  @dragleave.prevent="isDragging = false"
+                  @drop.prevent="handleFileDrop"
+                  class="mb-4 border-2 border-dashed rounded-2xl p-6 text-center transition-colors cursor-pointer"
+                  :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+                  @click="$refs.fileInput.click()">
+                  <input type="file" ref="fileInput" multiple class="hidden" @change="handleFileSelect" />
+                    <div class="text-3xl mb-2">☁️</div>
+                      <p class="text-sm font-bold text-slate-700">Kéo thả file vào đây hoặc <span class="text-indigo-600">tải lên từ máy</span></p>
+                      <p class="text-[10px] font-medium text-slate-400 mt-1">Hỗ trợ PDF, PNG, JPG, ZIP (Tối đa 5MB)</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" v-if="attachments.length > 0">
+                    <div v-for="(file, index) in attachments" :key="index" class="flex items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm group">
+                      <a :href="file.fileUrl" target="_blank" class="w-10 h-10 rounded-lg bg-indigo-50 hover:bg-indigo-100 flex items-center justify-center text-xl mr-3 shrink-0 transition">
+                        {{ getFileIcon(file.fileName) }}
+                      </a>
+                    <div class="flex-1 min-w-0">
+                      <a :href="file.fileUrl" target="_blank" class="text-sm font-bold text-slate-700 hover:text-indigo-600 truncate block">{{ file.fileName }}</a>
+                      <p class="text-[10px] text-slate-400">{{ file.fileSize ? (file.fileSize / 1024 / 1024).toFixed(2) : 0 }} MB</p>
+                    </div>
+                    <button
+                      v-if="!authStore.isViewer"
+                      @click="removeFile(index, file)"
+                      class="w-8 h-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                      title="Xóa file này"
+                    >🗑</button>
+                    </div>
+                  </div>
+                </div>
 
           <div class="mt-10 pt-8 border-t border-slate-100">
             <h4 class="text-sm font-black text-slate-800 mb-6 uppercase tracking-wider flex items-center gap-2">
@@ -218,7 +252,6 @@
 import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.store.js'
 import { useProjectStore } from '@/stores/project.store.js'
-
 const props = defineProps({
   task: { type: Object, required: true },
   members: { type: Array, default: () => [] },
@@ -250,6 +283,11 @@ watch(() => props.task, (val) => {
 onMounted(async () => {
   if (props.task?.id) {
     await loadComments()
+    try {
+      attachments.value = await projectStore.fetchAttachments(props.task.id)
+    } catch (error) {
+      console.error("Lỗi khi tải file đính kèm:", error)
+    }
   }
 })
 
@@ -294,6 +332,73 @@ function handleSubmit() {
   emit('update', payload)
   isEditing.value = false
 }
+const attachments = ref([])
+const isDragging = ref(false)
+const fileInput = ref(null)
+
+function getFileIcon(filename) {
+  if (!filename) return '📄'
+  const name = filename.toLowerCase()
+  if (name.endsWith('.pdf')) return '📕'
+  if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg')) return '🖼'
+  if (name.endsWith('.zip') || name.endsWith('.rar')) return '📦'
+  if (name.endsWith('.doc') || name.endsWith('.docx')) return '📘'
+  if (name.endsWith('.xls') || name.endsWith('.xlsx')) return '📗'
+  return '📄'
+}
+
+function handleFileDrop(e) {
+  isDragging.value = false
+  addFiles(e.dataTransfer.files)
+}
+
+function handleFileSelect(e) {
+  addFiles(e.target.files)
+}
+
+async function addFiles(files) {
+  const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+  for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      try {
+        const response = await fetch(CLOUDINARY_URL, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || 'Upload failed');
+        const downloadURL = data.secure_url;
+        const attachmentData = {
+          fileName: file.name,
+          fileUrl: downloadURL,
+          fileSize: file.size,
+          fileType: file.type
+        };
+        const newFile = await projectStore.addAttachment(props.task.id, attachmentData);
+        attachments.value.unshift(newFile);
+      } catch (error) {
+        console.error("Lỗi upload file Cloudinary:", error);
+        alert(`Không thể tải lên file ${file.name}`);
+      }
+    }
+  }
+async function removeFile(index, file) {
+  if (!confirm(`Bạn có chắc chắn muốn xóa file ${file.fileName} khỏi hệ thống?`)) return;
+  try {
+    if (file.id) {
+      await projectStore.deleteAttachment(props.task.id, file.id);
+    }
+    attachments.value.splice(index, 1);
+  } catch (error) {
+    console.error("Lỗi khi xóa file:", error);
+    alert("Không thể xóa file từ hệ thống lưu trữ!");
+  }
+}
 </script>
 
 <style scoped>
@@ -308,4 +413,5 @@ function handleSubmit() {
   background-color: #cbd5e1;
   border-radius: 20px;
 }
+
 </style>

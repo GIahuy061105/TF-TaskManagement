@@ -87,3 +87,24 @@ export async function approveTask(id) {
     data: { isPendingApproval: false, status: 'DONE' }
   })
 }
+export async function createAttachment(taskId, userId, data) {
+  return prisma.attachment.create({
+    data: {
+      ...data,
+      taskId,
+      userId
+    }
+  })
+}
+export async function getAttachmentsByTask(taskId) {
+  return prisma.attachment.findMany({
+    where: { taskId },
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
+export async function deleteAttachment(id) {
+  return prisma.attachment.delete({
+    where: { id }
+  })
+}
