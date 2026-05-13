@@ -115,7 +115,7 @@
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
-            <h2 class="font-semibold text-slate-800">🏆 Top Khách hàng Chi tiêu</h2>
+            <h2 class="font-semibold text-slate-800">🏆 Top Khách hàng </h2>
           </div>
 
           <div v-if="topClients.length === 0" class="flex-1 flex justify-center items-center py-12 text-slate-400 text-sm">

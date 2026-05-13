@@ -72,7 +72,7 @@ enum ProjectVisibility {
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
-  passwordHash String    @map("password_hash")
+  passwordHash String?    @map("password_hash")
   fullName     String    @map("full_name")
   avatarUrl    String?   @map("avatar_url")
   createdAt    DateTime  @default(now()) @map("created_at")
@@ -83,7 +83,13 @@ model User {
   lastSeenAt  DateTime? @map("last_seen_at")
   comments      Comment[]
   notifications Notification[]
-
+  provider             String    @default("LOCAL") // "LOCAL", "GOOGLE", "FACEBOOK"
+  providerId           String?   @unique
+  // Email Verified
+  isVerified           Boolean   @default(false)
+  verificationToken    String?
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
   sentInvitations Invitation[] @relation("InvitationInviter")
   ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
   assignedTasks TaskAssignee[]
@@ -320,4 +326,17 @@ model Attachment {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+}
+model Setting {
+  id              String   @id @default(uuid())
+  companyName     String   @default("CÔNG TY TNHH TASKFLOW")
+  taxCode         String?
+  address         String?
+  phone           String?
+  email           String?
+  logoUrl         String?
+  bankName        String?
+  bankAccount     String?
+  bankOwner       String?
+  updatedAt       DateTime @updatedAt
 }

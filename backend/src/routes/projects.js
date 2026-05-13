@@ -69,6 +69,12 @@ export async function projectRoutes(app) {
   app.post('/projects/:id/tasks', { preHandler: [authenticate,authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       const task = await createTask(request.params.id, request.body)
+      if (task.assignees && task.assignees.length > 0) {
+        task.assignees.forEach(assignee => {
+            sendTaskAssignmentEmail(assignee.user.email, assignee.user.fullName, task.title, task.dueDate)
+            .catch(err => console.error("Lỗi gửi mail khi tạo task:", err))
+        });
+      }
       return reply.code(201).send(task)
     } catch (err) {
       reply.code(400).send({ message: err.message })

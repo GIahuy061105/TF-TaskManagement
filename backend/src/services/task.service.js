@@ -31,6 +31,11 @@ export async function createTask(projectId, data) {
 
         assignees: (data.assigneeIds && data.assigneeIds.length > 0)
           ? {create: data.assigneeIds.map(id => ({user: { connect: { id } } }))}: undefined
+      },
+      include: {
+        assignees: {
+          include: { user: true }
+        }
       }
     })
   }
@@ -45,6 +50,11 @@ export async function updateTask(id, data) {
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
       assignees: data.assigneeIds
         ? {deleteMany: {}, create: data.assigneeIds.map(id => ({user: { connect: { id } }}))}: undefined
+    },
+    include: {
+        assignees: {
+            include: { user: true }
+        }
     }
   })
 }
@@ -108,3 +118,18 @@ export async function deleteAttachment(id) {
     where: { id }
   })
 }
+export const sendTaskAssignmentEmail = async (memberEmail, memberName, taskTitle, dueDate) => {
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px;">
+      <h2 style="color: #4f46e5;">Bạn có nhiệm vụ mới! ⚡</h2>
+      <p>Chào <strong>${memberName}</strong>,</p>
+      <p>Admin vừa giao cho bạn một công việc mới trên TaskFlow:</p>
+      <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #4f46e5;">
+        <p><strong>Công việc:</strong> ${taskTitle}</p>
+        <p><strong>Hạn chót:</strong> ${dueDate ? new Date(dueDate).toLocaleDateString('vi-VN') : 'Không có'}</p>
+      </div>
+      <p style="margin-top: 20px;">Vui lòng đăng nhập để kiểm tra chi tiết.</p>
+    </div>`;
+
+  await sendEmail(memberEmail, `[TaskFlow] Bạn đã được giao task: ${taskTitle}`, htmlContent);
+};

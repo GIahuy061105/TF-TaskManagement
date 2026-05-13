@@ -1,6 +1,7 @@
-import { registerUser, loginUser } from '../services/auth.service.js'
+import { registerUser, loginUser ,loginWithGoogle } from '../services/auth.service.js'
 import { authenticate } from '../middlewares/authenticate.js'
 import { authorize } from '../middlewares/rbac.js'
+import { sendEmail } from '../services/mailer.service.js'
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 export async function authRoutes(app) {
@@ -121,4 +122,75 @@ export async function authRoutes(app) {
     const { passwordHash, ...userSafe } = user
     return reply.send({ user: userSafe, workspaces })
   })
+  app.post('/auth/google', async (request, reply) => {
+    try {
+      const { credential } = request.body
+      const data = await loginWithGoogle(credential)
+      const activeWs = data.workspaces[0]
+      const accessToken = app.jwt.sign(
+        {
+            userId: data.user.id,
+            email: data.user.email,
+            workspaceId: activeWs?.id,
+            role: activeWs?.role || 'ADMIN'
+        },
+       { expiresIn: '1d' }
+      )
+      return reply.send({ accessToken, user: data.user, workspaces: data.workspaces,activeWorkspace: activeWs })
+    } catch (err) {
+        console.log(err)
+        reply.code(401).send({ message: 'Xác thực Google thất bại!' })
+    }
+  })
+  app.post('/auth/verify-email', async (request, reply) => {
+      const { email, otp } = request.body
+      const user = await prisma.user.findUnique({ where: { email } })
+
+      if (!user || user.verificationToken !== otp) {
+        return reply.code(400).send({ message: 'Mã OTP không hợp lệ hoặc sai email!' })
+      }
+      await prisma.user.update({
+        where: { email },
+        data: { isVerified: true, verificationToken: null }
+      })
+      return reply.send({ message: 'Xác thực tài khoản thành công!' })
+    })
+
+    app.post('/auth/forgot-password', async (request, reply) => {
+      const { email } = request.body
+      const user = await prisma.user.findUnique({ where: { email } })
+      if (!user) return reply.code(404).send({ message: 'Email không tồn tại trong hệ thống!' })
+      const otp = Math.floor(100000 + Math.random() * 900000).toString()
+      const expireTime = new Date(Date.now() + 15 * 60 * 1000)
+
+      await prisma.user.update({
+        where: { email },
+        data: { resetPasswordToken: otp, resetPasswordExpires: expireTime }
+      })
+      const html = `<h3>Yêu cầu lấy lại mật khẩu</h3>
+                    <p>Mã OTP đổi mật khẩu của bạn là: <b style="font-size:24px; color: blue;">${otp}</b></p>
+                    <p>Mã này có hiệu lực trong 15 phút.</p>`
+      await sendEmail(email, 'Khôi phục mật khẩu TaskFlow', html)
+
+      return reply.send({ message: 'Đã gửi mã OTP khôi phục vào email của bạn.' })
+    })
+    app.post('/auth/reset-password', async (request, reply) => {
+      const { email, otp, newPassword } = request.body
+      const user = await prisma.user.findUnique({ where: { email } })
+      if (!user || user.resetPasswordToken !== otp || user.resetPasswordExpires < new Date()) {
+        return reply.code(400).send({ message: 'Mã OTP không hợp lệ hoặc đã hết hạn!' })
+      }
+      const bcrypt = await import('bcrypt')
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+      await prisma.user.update({
+        where: { email },
+        data: {
+          passwordHash: hashedPassword,
+          resetPasswordToken: null,
+          resetPasswordExpires: null
+        }
+      })
+      return reply.send({ message: 'Đổi mật khẩu thành công! Bạn có thể đăng nhập.' })
+    })
 }

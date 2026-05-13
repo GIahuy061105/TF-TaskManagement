@@ -1,11 +1,18 @@
 import { authenticate } from '../middlewares/authenticate.js'
 import { authorize } from '../middlewares/rbac.js'
-import { updateTask, moveTask, deleteTask, logTime , requestTaskApprove , approveTask ,createAttachment , getAttachmentsByTask , deleteAttachment} from '../services/task.service.js'
+import { updateTask, moveTask, deleteTask, logTime , requestTaskApprove , approveTask ,createAttachment , getAttachmentsByTask , deleteAttachment , sendTaskAssignmentEmail} from '../services/task.service.js'
 import { getCommentsByTask, createComment } from '../services/comment.service.js'
 export async function taskRoutes(app) {
   app.patch('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {
       const task = await updateTask(request.params.id, request.body)
+      if (request.body.assigneeIds && task.assignees.length > 0) {
+        task.assignees.forEach(assignee => {
+          const user = assignee.user;
+          sendTaskAssignmentEmail(user.email, user.fullName, task.title, task.dueDate)
+          .catch(err => console.error("Lỗi gửi mail assignment:", err))
+        });
+      }
       return reply.send(task)
     } catch (err) {
       reply.code(400).send({ message: err.message })

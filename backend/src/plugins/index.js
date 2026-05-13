@@ -4,7 +4,7 @@ import cookie from '@fastify/cookie'
 
 export async function registerPlugins(app) {
   await app.register(cors, {
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173','http://localhost:5174', 'http://localhost:5175'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true
   })
@@ -18,4 +18,8 @@ export async function registerPlugins(app) {
       signed: false
     }
   })
+  app.addHook('onSend', async (request, reply) => {
+      reply.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+      reply.header('Cross-Origin-Embedder-Policy', 'unsafe-none')
+    })
 }

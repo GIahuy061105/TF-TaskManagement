@@ -57,6 +57,14 @@ export const useAuthStore = defineStore('auth', () => {
     saveToStorage()
     return res.data
   }
+  async function loginWithGoogle(credential) {
+    const res = await api.post('/auth/google', { credential })
+    accessToken.value = res.data.accessToken
+    user.value = res.data.user
+    workspaces.value = res.data.workspaces
+    activeWorkspace.value = res.data.activeWorkspace
+    saveToStorage()
+  }
   async function checkAuth() {
     try {
       const res = await api.get('/auth/me')

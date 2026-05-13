@@ -9,63 +9,80 @@
           🚀
         </div>
         <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">TaskFlow</h1>
-        <p class="text-slate-500 font-medium">Tạo tài khoản miễn phí để bắt đầu</p>
+        <p class="text-slate-500 font-medium">
+          {{ step === 'REGISTER' ? 'Tạo tài khoản miễn phí để bắt đầu' : 'Xác thực tài khoản của bạn' }}
+        </p>
       </div>
 
       <div class="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-2xl shadow-indigo-50/50 border border-white p-8 sm:p-10">
-        <form @submit.prevent="handleRegister" class="space-y-6">
+
+        <form v-if="step === 'REGISTER'" @submit.prevent="handleRegister" class="space-y-5">
           <div>
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Họ và tên</label>
-            <input
-              v-model="form.fullName"
-              type="text"
-              placeholder="Nguyễn Văn A"
-              class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800"
-              required
-            />
+            <input v-model="form.fullName" type="text" placeholder="Nguyễn Văn A" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800" required />
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Email</label>
-            <input
-              v-model="form.email"
-              type="email"
-              placeholder="name@example.com"
-              class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800"
-              required
-            />
+            <input v-model="form.email" type="email" placeholder="name@example.com" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800" required />
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">Mật khẩu</label>
-            <input
-              v-model="form.password"
-              type="password"
-              placeholder="••••••••"
-              class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800"
-              required
-            />
+            <input v-model="form.password" type="password" placeholder="••••••••" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800" required />
           </div>
 
           <p v-if="error" class="text-rose-500 text-sm font-bold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex items-center gap-2">
             <span>⚠️</span> {{ error }}
           </p>
 
-          <button
-            type="submit"
-            :disabled="loading"
-            class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0 mt-2"
-          >
+          <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 mt-2">
             {{ loading ? 'Đang thiết lập...' : 'Tạo tài khoản' }}
+          </button>
+
+          <div class="mt-6">
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-slate-400 font-medium tracking-wide text-[10px] uppercase">Hoặc đăng ký bằng</span>
+              </div>
+            </div>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <GoogleLogin :callback="callbackGoogle" class="w-full flex justify-center" />
+              <button type="button" class="flex justify-center items-center gap-2 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors font-bold text-sm text-slate-700">
+                <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5" alt="Facebook" /> Facebook
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <form v-else-if="step === 'VERIFY'" @submit.prevent="handleVerify" class="space-y-6">
+          <div class="text-center bg-indigo-50 p-4 rounded-2xl border border-indigo-100 mb-6">
+            <p class="text-sm font-medium text-indigo-800">Chúng tôi đã gửi mã xác nhận 6 số đến email:</p>
+            <p class="font-black text-indigo-600 mt-1">{{ form.email }}</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1 text-center">Nhập mã OTP</label>
+            <input v-model="otp" type="text" placeholder="123456" maxlength="6" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-2xl font-black tracking-[0.5em] text-center outline-none text-slate-800 uppercase" required />
+          </div>
+
+          <p v-if="error" class="text-rose-500 text-sm font-bold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex items-center gap-2">
+            <span>⚠️</span> {{ error }}
+          </p>
+          <p v-if="successMsg" class="text-emerald-600 text-sm font-bold bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-100 flex items-center gap-2">
+            <span>✅</span> {{ successMsg }}
+          </p>
+
+          <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-emerald-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50">
+            {{ loading ? 'Đang kiểm tra...' : 'Xác nhận Email' }}
           </button>
         </form>
 
-        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+        <div v-if="step === 'REGISTER'" class="mt-8 pt-6 border-t border-slate-100 text-center">
           <p class="text-sm text-slate-500 font-medium">
             Đã có tài khoản?
-            <RouterLink to="/login" class="text-indigo-600 font-bold hover:text-indigo-700 transition ml-1 hover:underline">
-              Đăng nhập ngay
-            </RouterLink>
+            <RouterLink to="/login" class="text-indigo-600 font-bold hover:text-indigo-700 transition ml-1 hover:underline">Đăng nhập ngay</RouterLink>
           </p>
         </div>
       </div>
@@ -77,22 +94,52 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
-
+import api from '@/api/index.js'
+import { decodeCredential } from 'vue3-google-login'
 const router = useRouter()
 const authStore = useAuthStore()
 
+const step = ref('REGISTER')
 const form = ref({ fullName: '', email: '', password: '' })
+const otp = ref('')
 const loading = ref(false)
 const error = ref('')
-
+const successMsg = ref('')
+const callbackGoogle = async (response) => {
+  loading.value = true
+  try {
+    await authStore.loginWithGoogle(response.credential)
+    alert('✅ Đăng nhập Google thành công!')
+    router.push('/dashboard')
+  } catch (err) {
+    error.value = 'Lỗi kết nối tài khoản Google.'
+  } finally {
+    loading.value = false
+  }
+}
 async function handleRegister() {
   loading.value = true
   error.value = ''
   try {
     await authStore.register(form.value.fullName, form.value.email, form.value.password)
-    router.push('/dashboard')
+    step.value = 'VERIFY'
+    successMsg.value = 'Đăng ký thành công! Vui lòng kiểm tra email.'
   } catch (err) {
     error.value = err.response?.data?.message || 'Đăng ký thất bại'
+  } finally {
+    loading.value = false
+  }
+}
+async function handleVerify() {
+  loading.value = true
+  error.value = ''
+  try {
+    await api.post('/auth/verify-email', { email: form.value.email, otp: otp.value })
+    alert('✅ Xác thực thành công! Đang tự động đăng nhập...')
+    await authStore.login(form.value.email, form.value.password)
+    router.push('/dashboard')
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Mã xác thực không hợp lệ!'
   } finally {
     loading.value = false
   }

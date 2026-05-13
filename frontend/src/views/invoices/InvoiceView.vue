@@ -247,19 +247,22 @@
   </AppLayout>
     <div class="absolute left-[-9999px] top-[-9999px] opacity-0 pointer-events-none">
         <div ref="invoicePdfRef" class="p-8" style="width: 190mm; background-color: #ffffff; color: #1e293b;">
-          <div class="flex justify-between items-start border-b-2 pb-6 mb-6" style="border-color: #1e293b;">
-            <div>
-              <h1 class="text-3xl font-black tracking-wider" style="color: #4338ca;">HÓA ĐƠN<br/>DỊCH VỤ</h1>
-              <p class="text-sm font-bold mt-2" style="color: #64748b;">Mã HĐ: {{ editingInvoice?.invoiceNumber }}</p>
-              <p class="text-sm" style="color: #64748b;">Ngày: {{ new Date().toLocaleDateString('vi-VN') }}</p>
-            </div>
-            <div class="text-right">
-              <h2 class="text-xl font-bold" style="color: #1e293b;">CÔNG TY TNHH PHẦN MỀM CỦA BẠN</h2>
-              <p class="text-sm">Tầng 10, Tòa nhà ABC, TP.HCM</p>
-              <p class="text-sm">MST: 0312345678</p>
-              <p class="text-sm">Email: contact@yourcompany.com</p>
-            </div>
-          </div>
+          <div class="border-b-2 pb-6 mb-8" style="border-color: #1e293b;">
+                  <div class="text-center mb-8">
+                    <h1 class="text-4xl font-black tracking-widest uppercase" style="color: #4338ca;">HÓA ĐƠN DỊCH VỤ</h1>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div class="space-y-1.5 text-left">
+                      <h2 class="text-xl font-black uppercase tracking-wide" style="color: #1e293b;">{{ settingStore.settings?.companyName }}</h2>
+                      <p class="text-sm" style="color: #475569;"><span class="font-bold" style="color: #1e293b;">Địa chỉ:</span> {{ settingStore.settings?.address }}</p>
+                      <p class="text-sm" style="color: #475569;"><span class="font-bold" style="color: #1e293b;">Mã số thuế:</span> {{ settingStore.settings?.taxCode }}</p>
+                      <p class="text-sm" style="color: #475569;"><span class="font-bold" style="color: #1e293b;">Email:</span> {{ settingStore.settings?.email }}</p>
+                      <p class="text-sm" style="color: #475569;"><span class="font-bold" style="color: #1e293b;">Mã hóa đơn:</span> {{ editingInvoice?.invoiceNumber }}</p>
+                      <p class="text-sm" style="color: #475569;"><span class="font-bold" style="color: #1e293b;">Ngày lập:</span> {{ new Date().toLocaleDateString('vi-VN') }}</p>
+                    </div>
+                  </div>
+                </div>
 
           <div class="flex justify-between mb-8">
             <div class="w-1/2">
@@ -337,6 +340,7 @@ import { useInvoiceStore } from '@/stores/invoice.store.js'
 import { useClientStore } from '@/stores/client.store.js'
 import { useProjectStore } from '@/stores/project.store.js'
 import AppLayout from '@/components/common/AppLayout.vue'
+import { useSettingStore } from '@/stores/setting.store.js'
 import html2pdf from 'html2pdf.js'
 const router = useRouter()
 const authStore = useAuthStore()
@@ -354,11 +358,12 @@ const defaultForm = {
   lineItems: [{ name: '', unit: 'Gói', quantity: 1, unitPrice: 0 }]
 }
 const form = ref(JSON.parse(JSON.stringify(defaultForm)))
-
+const settingStore = useSettingStore()
 onMounted(() => {
   invoiceStore.fetchInvoices()
   clientStore.fetchClients()
   projectStore.fetchProjects()
+  settingStore.fetchSettings()
 })
 
 const availableProjects = computed(() => {
