@@ -3,11 +3,12 @@
     <div
       v-for="column in columns"
       :key="column.status"
-      class="bg-slate-50/50 rounded-3xl border border-slate-100 p-5 flex flex-col"
+      class="rounded-3xl border border-slate-100 p-5 flex flex-col transition-colors duration-300 shadow-sm"
+      :class="column.columnBg"
     >
       <div class="flex items-center justify-between mb-5 px-1">
         <div class="flex items-center gap-3">
-          <span class="w-3 h-3 rounded-full shadow-sm" :class="column.color"></span>
+          <BaseIcon :path="mdiCircle" size="12" :class="column.color.replace('bg-', 'text-')" />
           <h3 class="font-black text-slate-800 tracking-tight">{{ column.label }}</h3>
         </div>
         <span class="text-xs font-black text-slate-500 bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100">
@@ -36,7 +37,8 @@
 import { ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import TaskCard from './TaskCard.vue'
-
+import { mdiCircle } from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 const props = defineProps({
   tasks: { type: Array, default: () => [] },
   isAdmin: { type: Boolean, default: false }
@@ -45,9 +47,9 @@ const props = defineProps({
 const emit = defineEmits(['open-task', 'move-task'])
 
 const columns = [
-  { status: 'TODO', label: 'Cần làm', color: 'bg-slate-400' },
-  { status: 'IN_PROGRESS', label: 'Đang làm', color: 'bg-blue-500' },
-  { status: 'DONE', label: 'Hoàn thành', color: 'bg-emerald-500' }
+  { status: 'TODO', label: 'Cần làm', color: 'bg-slate-400',columnBg: 'bg-slate-100' },
+  { status: 'IN_PROGRESS', label: 'Đang làm', color: 'bg-blue-500',columnBg: 'bg-blue-50 border-blue-100' },
+  { status: 'DONE', label: 'Hoàn thành', color: 'bg-emerald-500' ,columnBg: 'bg-emerald-50 border-emerald-100'}
 ]
 
 const taskColumns = ref({ TODO: [], IN_PROGRESS: [], DONE: [] })

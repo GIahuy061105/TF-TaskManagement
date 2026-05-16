@@ -5,7 +5,7 @@
   >
     <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col">
       <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-xl font-black text-slate-900">Thêm Task mới ✨</h3>
+        <h3 class="text-xl font-black text-slate-900 flex items-center gap-2 "> Thêm Task Mới <BaseIcon :path="mdiCreation" size="22" class="text-amber-400" /></h3>
         <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl transition">&times;</button>
       </div>
 
@@ -77,7 +77,8 @@
 
 <script setup>
 import { ref } from 'vue'
-
+import BaseIcon from '@/components/icon/BaseIcon.vue'
+import { mdiClose, mdiCreation } from '@mdi/js'
 defineProps({
   members: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false }
@@ -96,8 +97,12 @@ const form = ref({
 
 function handleSubmit() {
   const payload = { ...form.value }
+  if (payload.estimatedMins) {
+    payload.estimatedMins = parseInt(payload.estimatedMins)
+  } else {
+    delete payload.estimatedMins
+  }
   if (!payload.dueDate) delete payload.dueDate
-  if (!payload.estimatedMins) delete payload.estimatedMins
   emit('submit', payload)
   form.value = { title: '', description: '', priority: 'MEDIUM', dueDate: '', assigneeIds: [], estimatedMins: '' }
 }

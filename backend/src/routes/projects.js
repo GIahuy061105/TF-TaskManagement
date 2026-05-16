@@ -9,7 +9,7 @@ import {
   addMemberToProject,
   removeMemberFromProject
 } from '../services/project.service.js'
-import { getTasksByProject, createTask } from '../services/task.service.js'
+import { getTasksByProject, createTask, sendTaskAssignmentEmail } from '../services/task.service.js'
 
 export async function projectRoutes(app) {
   app.get('/projects', { preHandler: [authenticate,authorize(['ADMIN', 'MEMBER' ,'VIEWER'])] }, async (request, reply) => {

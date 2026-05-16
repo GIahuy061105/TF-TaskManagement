@@ -2,6 +2,7 @@ import { authenticate } from '../middlewares/authenticate.js'
 import { authorize } from '../middlewares/rbac.js'
 import { updateTask, moveTask, deleteTask, logTime , requestTaskApprove , approveTask ,createAttachment , getAttachmentsByTask , deleteAttachment , sendTaskAssignmentEmail} from '../services/task.service.js'
 import { getCommentsByTask, createComment } from '../services/comment.service.js'
+import { sendEmail } from '../services/mailer.service.js'
 export async function taskRoutes(app) {
   app.patch('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
     try {

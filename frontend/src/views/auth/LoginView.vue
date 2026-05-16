@@ -6,7 +6,7 @@
     <div class="w-full max-w-md relative z-10">
       <div class="text-center mb-10">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white text-3xl shadow-xl shadow-indigo-200 mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300 cursor-default">
-          ⚡
+          <BaseIcon :path="mdiLogin" size="30" />
         </div>
         <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">TaskFlow</h1>
         <p class="text-slate-500 font-medium">
@@ -33,7 +33,7 @@
           </div>
 
           <p v-if="error" class="text-rose-500 text-sm font-bold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex items-center gap-2">
-            <span>⚠️</span> {{ error }}
+            <BaseIcon :path="mdiAlert" size="20" class="shrink-0" />{{ error }}
           </p>
 
           <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 mt-2">
@@ -41,18 +41,21 @@
           </button>
 
           <div class="mt-6">
-            <div class="relative">
+            <div class="relative mb-4">
               <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-              <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white text-slate-400 font-medium tracking-wide text-[10px] uppercase">Hoặc đăng nhập bằng</span>
+              <div class="relative flex justify-center">
+                <span class="px-2 bg-white text-slate-400 font-medium text-[10px] uppercase">Hoặc đăng nhập bằng</span>
               </div>
             </div>
-            <div class="mt-6 grid grid-cols-2 gap-3">
-              <GoogleLogin :callback="callbackGoogle" class="w-full flex justify-center" />
-              <button type="button" class="flex justify-center items-center gap-2 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors font-bold text-sm text-slate-700">
-                <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5" alt="Facebook" /> Facebook
-              </button>
-            </div>
+
+            <button
+              type="button"
+              @click="handleGoogleLogin"
+              class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold text-sm text-slate-700"
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google" />
+              Đăng nhập với Google
+            </button>
           </div>
         </form>
 
@@ -132,7 +135,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
 import api from '@/api/index.js'
-import { decodeCredential } from 'vue3-google-login'
+import { decodeCredential, googleTokenLogin } from 'vue3-google-login'
+import { mdiLogin , mdiAlert } from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -219,6 +224,26 @@ async function handleResetPassword() {
     confirmPassword.value = ''
   } catch (err) {
     error.value = err.response?.data?.message || 'Mã OTP không đúng hoặc đã hết hạn!'
+  } finally {
+    loading.value = false
+  }
+}
+async function handleGoogleLogin() {
+  loading.value = true
+  error.value = ''
+  try {
+    const response = await googleTokenLogin({
+      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID
+    })
+    const res = await api.post('/auth/google-token', {
+      accessToken: response.access_token
+    })
+    await authStore.loginWithGoogle(res.data)
+    alert('✅ Đăng nhập Google thành công!')
+    router.push('/dashboard')
+  } catch (err) {
+    console.error("Chi tiết lỗi:", err)
+    error.value = err.response?.data?.message || 'Đăng nhập Google thất bại'
   } finally {
     loading.value = false
   }

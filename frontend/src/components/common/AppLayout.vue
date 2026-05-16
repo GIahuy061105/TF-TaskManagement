@@ -5,9 +5,9 @@
       <!-- Logo & Notification -->
       <div class="px-5 py-5 border-b border-slate-100 flex justify-between items-center ">
         <span class="text-lg font-bold text-slate-900">Task<span class="text-indigo-500">Flow</span></span>
-        <button v-if="invitations.length > 0" @click="showInviteModal = true" class="relative p-1">
-                  <span class="text-lg">🔔</span>
-                  <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+        <button v-if="invitations.length > 0" @click="showInviteModal = true" class="relative p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+                  <BaseIcon :path="mdiBell" size="22" class="text-slate-500" />
+                  <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </button>
       </div>
 
@@ -25,8 +25,8 @@
             ? 'bg-indigo-50 text-indigo-600'
             : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
         >
-          <span class="text-base">{{ item.icon }}</span>
-          {{ item.label }}
+          <BaseIcon :path="item.icon" size="20" />
+          <span>{{ item.label }}</span>
         </RouterLink>
         <div class="mt-4 pt-4 border-t border-slate-200">
           <button
@@ -80,16 +80,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="pt-4">
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2 mb-2">Account</p>
-          <RouterLink
-            to="/settings"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all"
-          >
-            <span class="text-base">⚙️</span> Settings
-          </RouterLink>
         </div>
       </nav>
 
@@ -204,19 +194,22 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
 import api from '@/api/index.js'
-
+import { mdiViewDashboard, mdiProjectorScreen, mdiAccountGroup, mdiFileDocumentOutline,
+         mdiCog, mdiPlus, mdiBell,mdiLogoutVariant } from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const invitations = ref([])
 const showInviteModal = ref(false)
 const navItems = computed(() => {
-  const allItems = [
-    { to: '/dashboard', icon: '⊞', label: 'Dashboard' },
-    { to: '/projects', icon: '◫', label: 'Projects' },
-    { to: '/clients', icon: '◎', label: 'Clients' },
-    { to: '/invoices', icon: '≡', label: 'Invoices', adminOnly: true }
-  ]
+const allItems = [
+      { to: '/dashboard', icon: mdiViewDashboard, label: 'Dashboard' },
+      { to: '/projects', icon: mdiProjectorScreen, label: 'Projects' },
+      { to: '/clients', icon: mdiAccountGroup, label: 'Clients' },
+      { to: '/invoices', icon: mdiFileDocumentOutline, label: 'Invoices', adminOnly: true },
+      { to: '/settings', icon: mdiCog, label: 'Settings', adminOnly: true }
+    ]
   return allItems.filter(item => !item.adminOnly || authStore.isAdmin)
 })
 const showInviteForm = ref(false)

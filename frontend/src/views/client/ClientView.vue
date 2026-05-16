@@ -16,7 +16,7 @@
       </div>
 
       <div v-if="clientStore.clients.length === 0" class="flex flex-col items-center justify-center py-24 bg-white/50 rounded-3xl border border-dashed border-slate-300">
-        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-4xl mb-4">🤝</div>
+        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-4xl mb-4"><BaseIcon :path="mdiHandshakeOutline" size="40"/></div>
         <h3 class="text-lg font-bold text-slate-800">Chưa có khách hàng</h3>
         <p class="text-slate-500 text-sm mt-1">Lưu trữ thông tin khách hàng để dễ dàng tạo hóa đơn.</p>
       </div>
@@ -28,8 +28,8 @@
           class="group bg-white rounded-3xl border border-slate-100 p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col h-full relative"
         >
           <div v-if="authStore.isAdmin" class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button @click="openEdit(client)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-indigo-500 hover:bg-indigo-50 transition" title="Sửa">✏️</button>
-            <button @click="handleDelete(client.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-rose-500 hover:bg-rose-50 transition" title="Xóa">🗑</button>
+            <button @click="openEdit(client)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-indigo-500 hover:bg-indigo-50 transition" title="Sửa"><BaseIcon :path="mdiPencil" size="20"/></button>
+            <button @click="handleDelete(client.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-rose-500 hover:bg-rose-50 transition" title="Xóa"><BaseIcon :path="mdiTrashCan" size="20"/></button>
           </div>
 
           <div class="flex items-center gap-4 mb-6">
@@ -44,23 +44,23 @@
 
           <div class="space-y-3 mb-6 flex-1">
             <div class="flex items-center gap-3 text-sm text-slate-600">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">📧</div>
+              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0"><BaseIcon :path="mdiEmail" size="20"/></div>
               <span class="truncate font-medium">{{ client.email || '—' }}</span>
             </div>
             <div class="flex items-center gap-3 text-sm text-slate-600">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">📞</div>
+              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0"><BaseIcon :path="mdiPhone" size="20"/></div>
               <span class="font-medium">{{ client.phone || '—' }}</span>
             </div>
             <div class="flex items-center gap-3 text-sm text-slate-600">
-              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">🏛</div>
+              <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0"><BaseIcon :path="mdiTownHall" size="20"/></div>
               <span class="font-medium">MST: {{ client.taxCode || '—' }}</span>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-4 border-t border-slate-50">
             <div class="flex items-center gap-3 text-xs font-bold text-slate-400">
-              <span class="flex items-center gap-1"><span class="text-indigo-400">📁</span> {{ client._count?.projects || 0 }}</span>
-              <span class="flex items-center gap-1"><span class="text-amber-400">🧾</span> {{ client._count?.invoices || 0 }}</span>
+              <span class="flex items-center gap-1"><span class="text-indigo-400"><BaseIcon :path="mdiFolder" size="17"/></span> {{ client._count?.projects || 0 }}</span>
+              <span class="flex items-center gap-1"><span class="text-amber-400"><BaseIcon :path="mdiInvoice" size="17"/></span> {{ client._count?.invoices || 0 }}</span>
             </div>
             <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600">
               {{ client.currency }}
@@ -142,6 +142,9 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store.js'
 import { useClientStore } from '@/stores/client.store.js'
 import AppLayout from '@/components/common/AppLayout.vue'
+import { mdiHandshakeOutline , mdiEmail , mdiPhone , mdiTownHall , mdiFolder ,mdiInvoice , mdiTrashCan, mdiPencil} from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
+
 
 const router = useRouter()
 const authStore = useAuthStore()

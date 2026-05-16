@@ -33,13 +33,14 @@
             class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 transition shadow-sm ml-auto xl:ml-0"
             title="Xóa dự án"
           >
-            🗑
+            <BaseIcon :path="mdiDeleteOutline" size="18" />
           </button>
         </div>
 
         <div class="flex items-center gap-3 mt-3">
           <p v-if="project.client" class="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-            <span class="text-slate-300 text-lg">🏢</span> Khách hàng: <span class="text-slate-700 font-bold">{{ project.client.name }}</span>
+            <BaseIcon :path="mdiOfficeBuilding" size="18" class="text-slate-400" />
+            Khách hàng: <span class="text-slate-700 font-bold">{{ project.client.name }}</span>
           </p>
         </div>
       </div>
@@ -62,10 +63,10 @@
             <button
               v-if="isAdmin"
               @click="$emit('manage-members')"
-              class="w-10 h-10 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-indigo-400 hover:text-indigo-500 hover:bg-indigo-50 transition bg-white ml-2 shadow-sm font-bold text-lg"
+              class="w-10 h-10 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-indigo-400 hover:text-indigo-500 hover:bg-indigo-50 transition bg-white ml-2 shadow-sm"
               title="Quản lý thành viên"
             >
-              +
+              <BaseIcon :path="mdiAccountPlusOutline" size="20" />
             </button>
           </div>
         </div>
@@ -75,14 +76,14 @@
           @click="$emit('add-task')"
           class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-indigo-200 hover:shadow-lg hover:shadow-indigo-300 hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2"
         >
-          <span class="text-lg leading-none">+</span> Tạo công việc
+          <BaseIcon :path="mdiPlus" size="20" /> Tạo công việc
         </button>
       </div>
     </div>
 
     <div v-if="contributions.length > 0" class="mb-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
       <h3 class="text-sm font-black text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-wider">
-        <span class="text-xl">🏆</span> Bảng xếp hạng đóng góp
+        <BaseIcon :path="mdiTrophy" size="22" class="text-amber-500" /> Bảng xếp hạng đóng góp
       </h3>
       <div class="flex flex-wrap gap-8">
         <div
@@ -115,6 +116,8 @@
 
 <script setup>
 import { computed } from 'vue'
+import { mdiDeleteOutline, mdiOfficeBuilding, mdiPlus, mdiTrophy, mdiAccountPlusOutline } from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue' // Điều chỉnh đường dẫn nếu cần
 
 const props = defineProps({
   project: { type: Object, required: true },

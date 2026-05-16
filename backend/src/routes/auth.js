@@ -154,9 +154,9 @@ export async function authRoutes(app) {
         data: { isVerified: true, verificationToken: null }
       })
       return reply.send({ message: 'Xác thực tài khoản thành công!' })
-    })
+  })
 
-    app.post('/auth/forgot-password', async (request, reply) => {
+  app.post('/auth/forgot-password', async (request, reply) => {
       const { email } = request.body
       const user = await prisma.user.findUnique({ where: { email } })
       if (!user) return reply.code(404).send({ message: 'Email không tồn tại trong hệ thống!' })
@@ -173,8 +173,8 @@ export async function authRoutes(app) {
       await sendEmail(email, 'Khôi phục mật khẩu TaskFlow', html)
 
       return reply.send({ message: 'Đã gửi mã OTP khôi phục vào email của bạn.' })
-    })
-    app.post('/auth/reset-password', async (request, reply) => {
+  })
+  app.post('/auth/reset-password', async (request, reply) => {
       const { email, otp, newPassword } = request.body
       const user = await prisma.user.findUnique({ where: { email } })
       if (!user || user.resetPasswordToken !== otp || user.resetPasswordExpires < new Date()) {
@@ -192,5 +192,42 @@ export async function authRoutes(app) {
         }
       })
       return reply.send({ message: 'Đổi mật khẩu thành công! Bạn có thể đăng nhập.' })
-    })
+  })
+  app.post('/auth/google-token', async (request, reply) => {
+    try {
+      const { accessToken } = request.body
+      const response = await fetch(
+        `https://www.googleapis.com/oauth2/v3/userinfo`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      )
+      const googleUser = await response.json()
+
+      if (!googleUser.email) {
+        return reply.code(401).send({ message: 'Không lấy được thông tin Google' })
+      }
+
+      const data = await loginWithGoogle(null, googleUser)
+      const activeWs = data.workspaces[0]
+
+      const token = app.jwt.sign(
+        {
+          userId: data.user.id,
+          email: data.user.email,
+          workspaceId: activeWs?.id,
+          role: activeWs?.role || 'ADMIN'
+        },
+        { expiresIn: '1d' }
+      )
+
+      return reply.send({
+        accessToken: token,
+        user: data.user,
+        workspaces: data.workspaces,
+        activeWorkspace: activeWs
+      })
+    } catch (err) {
+      console.log(err)
+      reply.code(401).send({ message: 'Xác thực Google thất bại!' })
+    }
+  })
 }

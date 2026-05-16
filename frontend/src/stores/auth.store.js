@@ -57,13 +57,18 @@ export const useAuthStore = defineStore('auth', () => {
     saveToStorage()
     return res.data
   }
-  async function loginWithGoogle(credential) {
-    const res = await api.post('/auth/google', { credential })
-    accessToken.value = res.data.accessToken
-    user.value = res.data.user
-    workspaces.value = res.data.workspaces
-    activeWorkspace.value = res.data.activeWorkspace
-    saveToStorage()
+  async function loginWithGoogle(data) {
+    try {
+      accessToken.value = data.accessToken
+      user.value = data.user
+      workspaces.value = data.workspaces
+      activeWorkspace.value = data.activeWorkspace
+      saveToStorage()
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`
+    } catch (error) {
+      console.error("Store Error:", error)
+      throw error
+    }
   }
   async function checkAuth() {
     try {
@@ -113,6 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
     workspaceSettings,
     workspaceLogo,
     login,
+    loginWithGoogle,
     logout,
     checkAuth,
     switchWorkspace

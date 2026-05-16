@@ -95,16 +95,25 @@ export async function loginUser({ email, password }) {
   const { passwordHash, ...userWithoutPassword } = user
   return { user: userWithoutPassword, workspaces }
 }
-export async function loginWithGoogle(idToken) {
-  // 1. Giải mã Token từ Google
-  const ticket = await googleClient.verifyIdToken({
-    idToken: idToken,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  })
-  const payload = ticket.getPayload()
-  const { email, name, sub: googleId } = payload
+export async function loginWithGoogle(idToken, googleUserInfo = null) {
+  let email, name, googleId
 
-  // 2. Tìm User trong DB (Kèm luôn bảng memberships giống hệt hàm loginUser)
+  if (googleUserInfo) {
+    // Từ access token flow
+    email = googleUserInfo.email
+    name = googleUserInfo.name
+    googleId = googleUserInfo.sub
+  } else {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    })
+    const payload = ticket.getPayload()
+    email = payload.email
+    name = payload.name
+    googleId = payload.sub
+  }
+
   let user = await prisma.user.findUnique({
     where: { email },
     include: {
@@ -113,8 +122,6 @@ export async function loginWithGoogle(idToken) {
       }
     }
   })
-
-  // 3. Nếu User chưa tồn tại -> Tạo mới hoàn toàn
   if (!user) {
     user = await prisma.user.create({
       data: {
@@ -122,7 +129,7 @@ export async function loginWithGoogle(idToken) {
         email: email,
         provider: 'GOOGLE',
         providerId: googleId,
-        isVerified: true, // Không cần gửi OTP vì Google đã lo
+        isVerified: true,
         ownedWorkspaces: {
           create: {
             name: `${name}'s Workspace`,
@@ -145,7 +152,6 @@ export async function loginWithGoogle(idToken) {
           }
         }
       },
-      // Bắt buộc include lại để đoạn map() ở dưới không bị lỗi
       include: {
         memberships: {
           include: { workspace: true }
@@ -154,7 +160,6 @@ export async function loginWithGoogle(idToken) {
     })
   }
 
-  // 4. Lấy danh sách Workspace y hệt như hàm login thường
   const workspaces = user.memberships.map(m => ({
     id: m.workspace.id,
     name: m.workspace.name,
@@ -163,7 +168,6 @@ export async function loginWithGoogle(idToken) {
     role: m.workspace.ownerId === user.id ? 'ADMIN' : m.role
   }))
 
-  // 5. Cắt bỏ passwordHash trước khi trả về Frontend
   const { passwordHash, ...userWithoutPassword } = user
 
   return { user: userWithoutPassword, workspaces }

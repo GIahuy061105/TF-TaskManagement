@@ -19,26 +19,28 @@
 
         <div class="flex items-center gap-3">
           <button v-if="!isEditing && isAdmin" @click="isEditing = true" class="text-sm font-bold text-indigo-500 hover:text-indigo-700 transition flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-lg">
-            ✏️ Sửa
+            <BaseIcon :path="mdiPencil" size="16" /> Sửa
           </button>
 
-          <button v-if="!isAdmin && task.status !== 'DONE' && !task.isPendingApproval" @click="$emit('request-approval', task)" class="bg-amber-100 text-amber-700 hover:bg-amber-200 text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
-            ⏳ Gửi yêu cầu duyệt
+          <button v-if="!isAdmin && task.status !== 'DONE' && !task.isPendingApproval" @click="$emit('request-approval', task)" class="bg-amber-100 text-amber-700 hover:bg-amber-200 flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
+            <BaseIcon :path="mdiTimerSand" size="16" /> Gửi yêu cầu duyệt
           </button>
 
           <span v-if="task.isPendingApproval && !isAdmin" class="text-xs font-bold text-amber-500 italic bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">
             Đang chờ Admin duyệt...
           </span>
 
-          <button v-if="isAdmin && task.isPendingApproval" @click="$emit('approve-task', task)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
-            ✅ Phê duyệt Task
+          <button v-if="isAdmin && task.isPendingApproval" @click="$emit('approve-task', task)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
+            <BaseIcon :path="mdiCheckDecagram" size="16" /> Phê duyệt Task
           </button>
 
           <button v-if="isAdmin" @click="$emit('delete-task', task)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 transition shadow-sm" title="Xóa task">
-            🗑
+            <BaseIcon :path="mdiDeleteOutline" size="18" />
           </button>
 
-          <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl transition ml-2">&times;</button>
+          <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition ml-2">
+            <BaseIcon :path="mdiClose" size="24" />
+          </button>
         </div>
       </div>
 
@@ -64,7 +66,8 @@
             <div>
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Hạn chót</p>
               <p class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <span class="text-slate-400">📅</span> {{ task.dueDate ? new Date(task.dueDate).toLocaleDateString('vi-VN') : 'Không có' }}
+                <BaseIcon :path="mdiCalendarMonth" size="18" class="text-slate-400" />
+                {{ task.dueDate ? new Date(task.dueDate).toLocaleDateString('vi-VN') : 'Không có' }}
               </p>
             </div>
 
@@ -79,7 +82,8 @@
             <div>
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Ước tính</p>
               <p class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <span class="text-slate-400">⏱</span> {{ task.estimatedMins ? `${task.estimatedMins} phút` : '—' }}
+                <BaseIcon :path="mdiClockOutline" size="18" class="text-slate-400" />
+                {{ task.estimatedMins ? `${task.estimatedMins} phút` : '—' }}
               </p>
             </div>
           </div>
@@ -90,44 +94,49 @@
               {{ task.description || 'Chưa có mô tả chi tiết cho công việc này.' }}
             </div>
           </div>
+
           <div class="mt-8">
             <h4 class="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider flex items-center gap-2">
-            <span class="text-indigo-500 text-lg">📎</span> Tài liệu đính kèm ({{ attachments.length }})
-              </h4>
-                <div v-if="!authStore.isViewer"
-                  @dragover.prevent="isDragging = true"
-                  @dragleave.prevent="isDragging = false"
-                  @drop.prevent="handleFileDrop"
-                  class="mb-4 border-2 border-dashed rounded-2xl p-6 text-center transition-colors cursor-pointer"
-                  :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
-                  @click="$refs.fileInput.click()">
-                  <input type="file" ref="fileInput" multiple class="hidden" @change="handleFileSelect" />
-                    <div class="text-3xl mb-2">☁️</div>
-                      <p class="text-sm font-bold text-slate-700">Kéo thả file vào đây hoặc <span class="text-indigo-600">tải lên từ máy</span></p>
-                      <p class="text-[10px] font-medium text-slate-400 mt-1">Hỗ trợ PDF, PNG, JPG, ZIP (Tối đa 5MB)</p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" v-if="attachments.length > 0">
-                    <div v-for="(file, index) in attachments" :key="index" class="flex items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm group">
-                      <a :href="file.fileUrl" target="_blank" class="w-10 h-10 rounded-lg bg-indigo-50 hover:bg-indigo-100 flex items-center justify-center text-xl mr-3 shrink-0 transition">
-                        {{ getFileIcon(file.fileName) }}
-                      </a>
-                    <div class="flex-1 min-w-0">
-                      <a :href="file.fileUrl" target="_blank" class="text-sm font-bold text-slate-700 hover:text-indigo-600 truncate block">{{ file.fileName }}</a>
-                      <p class="text-[10px] text-slate-400">{{ file.fileSize ? (file.fileSize / 1024 / 1024).toFixed(2) : 0 }} MB</p>
-                    </div>
-                    <button
-                      v-if="!authStore.isViewer"
-                      @click="removeFile(index, file)"
-                      class="w-8 h-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                      title="Xóa file này"
-                    >🗑</button>
-                    </div>
-                  </div>
+              <BaseIcon :path="mdiAttachment" size="20" class="text-indigo-500" /> Tài liệu đính kèm ({{ attachments.length }})
+            </h4>
+
+            <div v-if="!authStore.isViewer"
+              @dragover.prevent="isDragging = true"
+              @dragleave.prevent="isDragging = false"
+              @drop.prevent="handleFileDrop"
+              class="mb-4 border-2 border-dashed rounded-2xl p-6 text-center transition-colors cursor-pointer flex flex-col items-center justify-center"
+              :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'"
+              @click="$refs.fileInput.click()">
+              <input type="file" ref="fileInput" multiple class="hidden" @change="handleFileSelect" />
+              <BaseIcon :path="mdiCloudUploadOutline" size="40" class="text-indigo-400 mb-2" />
+              <p class="text-sm font-bold text-slate-700">Kéo thả file vào đây hoặc <span class="text-indigo-600">tải lên từ máy</span></p>
+              <p class="text-[10px] font-medium text-slate-400 mt-1">Hỗ trợ PDF, PNG, JPG, ZIP (Tối đa 5MB)</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" v-if="attachments.length > 0">
+              <div v-for="(file, index) in attachments" :key="index" class="flex items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm group">
+                <a :href="file.fileUrl" target="_blank" class="w-10 h-10 rounded-lg bg-indigo-50 hover:bg-indigo-100 flex items-center justify-center text-indigo-500 mr-3 shrink-0 transition">
+                  <BaseIcon :path="getFileIcon(file.fileName)" size="24" />
+                </a>
+                <div class="flex-1 min-w-0">
+                  <a :href="file.fileUrl" target="_blank" class="text-sm font-bold text-slate-700 hover:text-indigo-600 truncate block">{{ file.fileName }}</a>
+                  <p class="text-[10px] text-slate-400">{{ file.fileSize ? (file.fileSize / 1024 / 1024).toFixed(2) : 0 }} MB</p>
                 </div>
+                <button
+                  v-if="!authStore.isViewer"
+                  @click="removeFile(index, file)"
+                  class="w-8 h-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  title="Xóa file này"
+                >
+                  <BaseIcon :path="mdiDeleteOutline" size="18" />
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div class="mt-10 pt-8 border-t border-slate-100">
             <h4 class="text-sm font-black text-slate-800 mb-6 uppercase tracking-wider flex items-center gap-2">
-              <span class="text-indigo-500 text-lg">💬</span> Thảo luận ({{ comments.length }})
+              <BaseIcon :path="mdiMessageTextOutline" size="20" class="text-indigo-500" /> Thảo luận ({{ comments.length }})
             </h4>
 
             <div class="space-y-5 mb-8">
@@ -170,7 +179,7 @@
                   :disabled="!newComment.trim() || isSubmittingComment"
                   class="absolute right-2 bottom-2 w-9 h-9 flex items-center justify-center bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition shadow-sm"
                 >
-                  <span class="font-bold text-lg leading-none transform -rotate-45 block mb-0.5 ml-0.5">➔</span>
+                  <BaseIcon :path="mdiSend" size="18" class="transform -rotate-12" />
                 </button>
               </div>
             </div>
@@ -248,26 +257,30 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.store.js'
 import { useProjectStore } from '@/stores/project.store.js'
+import {
+  mdiPencil, mdiTimerSand, mdiCheckDecagram, mdiDeleteOutline, mdiClose,
+  mdiCalendarMonth, mdiClockOutline, mdiAttachment, mdiCloudUploadOutline,
+  mdiMessageTextOutline, mdiSend,
+  mdiFileDocumentOutline, mdiFilePdfBox, mdiImageOutline, mdiZipBoxOutline, mdiFileWordBox, mdiFileExcelBox
+} from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
+
 const props = defineProps({
   task: { type: Object, required: true },
   members: { type: Array, default: () => [] },
   isAdmin: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
-
 const emit = defineEmits(['close', 'update', 'delete-task', 'request-approval', 'approve-task'])
-
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
-
 const isEditing = ref(false)
 const form = ref({})
-
-// Comment logic
 const comments = ref([])
 const newComment = ref('')
 const isSubmittingComment = ref(false)
@@ -337,14 +350,14 @@ const isDragging = ref(false)
 const fileInput = ref(null)
 
 function getFileIcon(filename) {
-  if (!filename) return '📄'
+  if (!filename) return mdiFileDocumentOutline
   const name = filename.toLowerCase()
-  if (name.endsWith('.pdf')) return '📕'
-  if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg')) return '🖼'
-  if (name.endsWith('.zip') || name.endsWith('.rar')) return '📦'
-  if (name.endsWith('.doc') || name.endsWith('.docx')) return '📘'
-  if (name.endsWith('.xls') || name.endsWith('.xlsx')) return '📗'
-  return '📄'
+  if (name.endsWith('.pdf')) return mdiFilePdfBox
+  if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg')) return mdiImageOutline
+  if (name.endsWith('.zip') || name.endsWith('.rar')) return mdiZipBoxOutline
+  if (name.endsWith('.doc') || name.endsWith('.docx')) return mdiFileWordBox
+  if (name.endsWith('.xls') || name.endsWith('.xlsx')) return mdiFileExcelBox
+  return mdiFileDocumentOutline
 }
 
 function handleFileDrop(e) {
@@ -402,7 +415,6 @@ async function removeFile(index, file) {
 </script>
 
 <style scoped>
-/* Thêm scrollbar tùy chỉnh cho đẹp (Tùy chọn) */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -413,5 +425,4 @@ async function removeFile(index, file) {
   background-color: #cbd5e1;
   border-radius: 20px;
 }
-
 </style>

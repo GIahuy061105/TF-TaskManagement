@@ -18,7 +18,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-shadow group">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 text-xl font-black group-hover:scale-110 transition-transform">⏳</div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 text-xl font-black group-hover:scale-110 transition-transform"><BaseIcon :path="mdiTimerSand" size="20"/></div>
             <div>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Chờ thanh toán</p>
               <p class="text-2xl font-black text-amber-500">{{ formatMoney(totalByStatus('SENT')) }}</p>
@@ -27,7 +27,7 @@
         </div>
         <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-shadow group">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl font-black group-hover:scale-110 transition-transform">💰</div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl font-black group-hover:scale-110 transition-transform"><BaseIcon :path="mdiCashMultiple" size="20"/></div>
             <div>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Đã thanh toán</p>
               <p class="text-2xl font-black text-emerald-500">{{ formatMoney(totalByStatus('PAID')) }}</p>
@@ -36,7 +36,7 @@
         </div>
         <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-shadow group">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 text-xl font-black group-hover:scale-110 transition-transform">🧾</div>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 text-xl font-black group-hover:scale-110 transition-transform"><BaseIcon :path="mdiInvoiceCheck" size="20"/></div>
             <div>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tổng số hóa đơn</p>
               <p class="text-2xl font-black text-slate-800">{{ invoiceStore.invoices.length }}</p>
@@ -46,7 +46,7 @@
       </div>
 
       <div v-if="invoiceStore.invoices.length === 0" class="flex flex-col items-center justify-center py-24 bg-white/50 rounded-3xl border border-dashed border-slate-300">
-        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-4xl mb-4">🧾</div>
+        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-4xl mb-4"><BaseIcon :path="mdiInvoiceList" size="35"/></div>
         <h3 class="text-lg font-bold text-slate-800">Chưa có hóa đơn nào</h3>
         <p class="text-slate-500 text-sm mt-1">Tạo hóa đơn đầu tiên để bắt đầu ghi nhận doanh thu.</p>
       </div>
@@ -73,7 +73,7 @@
                 <td class="px-6 py-4 text-sm font-black text-indigo-600">{{ invoice.invoiceNumber }}</td>
                 <td class="px-6 py-4">
                   <p class="text-sm font-bold text-slate-800">{{ invoice.client?.company || invoice.client?.name }}</p>
-                  <p v-if="invoice.project" class="text-[11px] font-semibold text-slate-400 mt-0.5">📁 {{ invoice.project.name }}</p>
+                  <p v-if="invoice.project" class="text-[11px] font-semibold text-slate-400 mt-0.5"><BaseIcon :path="mdiFolder" size="20"/> {{ invoice.project.name }}</p>
                 </td>
                 <td class="px-6 py-4 text-sm font-black text-slate-800">
                   {{ formatMoney(invoice.total, invoice.client?.currency) }}
@@ -98,8 +98,8 @@
                     <button v-if="invoice.status === 'DRAFT'" @click="handleSend(invoice.id)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition font-black">Chốt & Gửi</button>
                     <button v-if="invoice.status !== 'DRAFT'" @click="openView(invoice)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition font-black">Xem lại</button>
                     <button v-if="invoice.status === 'SENT'" @click="handleMarkPaid(invoice.id)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition font-black">Đã thu tiền</button>
-                    <button v-if="invoice.status === 'DRAFT'" @click="openEdit(invoice)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-blue-500 hover:bg-blue-50 transition">✏️</button>
-                    <button v-if="invoice.status === 'DRAFT'" @click="handleDelete(invoice.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 transition">🗑</button>
+                    <button v-if="invoice.status === 'DRAFT'" @click="openEdit(invoice)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-blue-500 hover:bg-blue-50 transition"><BaseIcon :path="mdiPencil" size="20"/></button>
+                    <button v-if="invoice.status === 'DRAFT'" @click="handleDelete(invoice.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 transition"><BaseIcon :path="mdiTrashCan" size="20"/></button>
                   </div>
                 </td>
               </tr>
@@ -113,7 +113,7 @@
       <div class="bg-white rounded-3xl w-full max-w-4xl shadow-2xl max-h-full overflow-y-auto custom-scrollbar flex flex-col">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-20 rounded-t-3xl">
           <h3 class="text-xl font-black text-slate-900 flex items-center gap-2">
-            <span class="text-indigo-500">🧾</span>
+            <span class="text-indigo-500"><BaseIcon :path="mdiInvoice" size="20"/></span>
             {{ isViewing ? 'Chi tiết Hóa đơn' : (editingInvoice ? 'Chỉnh sửa Hóa đơn' : 'Tạo hóa đơn mới') }}
           </h3>
           <button @click="closeModal" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl transition">&times;</button>
@@ -235,7 +235,7 @@
               @click="downloadPDF"
               class="flex-1 py-3.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold transition flex justify-center items-center gap-2 border border-red-100"
             >
-              📄 Tải bản in PDF
+              <BaseIcon :path="mdiFilePdfBox" size="20"/> Tải bản in PDF
             </button>
             <button v-if="!isViewing" type="submit" :disabled="loading" class="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition shadow-md hover:shadow-lg disabled:opacity-50">
               {{ loading ? 'Hệ thống đang xử lý...' : (editingInvoice ? 'Cập nhật Hóa Đơn' : 'Lưu & Tạo Hóa Đơn') }}
@@ -341,6 +341,8 @@ import { useClientStore } from '@/stores/client.store.js'
 import { useProjectStore } from '@/stores/project.store.js'
 import AppLayout from '@/components/common/AppLayout.vue'
 import { useSettingStore } from '@/stores/setting.store.js'
+import { mdiTimerSand , mdiCashMultiple , mdiInvoiceCheck , mdiInvoice, mdiInvoiceList , mdiFolder , mdiPencil , mdiTrashCan , mdiFilePdfBox} from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 import html2pdf from 'html2pdf.js'
 const router = useRouter()
 const authStore = useAuthStore()

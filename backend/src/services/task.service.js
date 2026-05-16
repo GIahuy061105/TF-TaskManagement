@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-
+import { sendEmail } from './mailer.service.js'
 const prisma = new PrismaClient()
 
 export async function getTasksByProject(projectId) {

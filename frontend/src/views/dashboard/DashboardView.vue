@@ -4,44 +4,44 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p class="text-slate-400 text-sm mt-1">Xin chào, {{ authStore.user?.fullName }} 👋</p>
+          <p class="flex items-center gap-2 text-amber-600 text-sm mt-1">Xin chào, {{ authStore.user?.fullName }}  <BaseIcon :path="mdiHandClap" size="22"/></p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center text-lg">💰</div>
+            <div class="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center text-lg"> <BaseIcon :path="mdiCashMultiple" size="22"/></div>
             <span class="text-xs font-semibold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full">Đã thu</span>
           </div>
-          <p class="text-xs text-slate-400 mb-1">Tổng Doanh thu</p>
+          <p class="text-xs text-slate-600 mb-1">Tổng Doanh thu</p>
           <p class="text-2xl font-bold text-emerald-600">{{ formatMoney(kpi.totalRevenue) }}</p>
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center text-lg">⏳</div>
-            <span class="text-xs font-semibold bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full">Chờ thu tiền</span>
+            <div class="w-9 h-9 bg-amber-300 rounded-xl flex items-center justify-center text-lg"> <BaseIcon :path="mdiTimerSand" size="22"/></div>
+            <span class="text-xs font-semibold bg-amber-200 text-amber-600 px-2.5 py-1 rounded-full">Chờ thu tiền</span>
           </div>
-          <p class="text-xs text-slate-400 mb-1">Công nợ</p>
+          <p class="text-xs text-slate-600 mb-1">Công nợ</p>
           <p class="text-2xl font-bold text-amber-500">{{ formatMoney(kpi.pendingRevenue) }}</p>
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center text-lg">🚀</div>
+            <div class="w-9 h-9 bg-blue-200 rounded-xl flex items-center justify-center text-lg"> <BaseIcon :path="mdiRocketLaunch" size="22"/></div>
             <span class="text-xs font-semibold bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full">Active</span>
           </div>
-          <p class="text-xs text-slate-400 mb-1">Dự án đang chạy</p>
+          <p class="text-xs text-slate-600 mb-1">Dự án đang chạy</p>
           <p class="text-2xl font-bold text-indigo-600">{{ kpi.activeProjects }}</p>
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex items-center justify-between mb-4">
-            <div class="w-9 h-9 bg-orange-50 rounded-xl flex items-center justify-center text-lg">🏢</div>
-            <span class="text-xs font-semibold bg-orange-50 text-orange-600 px-2.5 py-1 rounded-full">Total</span>
+            <div class="w-9 h-9 bg-orange-200 rounded-xl flex items-center justify-center text-lg"> <BaseIcon :path="mdiClipboardAccount" size="22"/></div>
+            <span class="text-xs font-semibold bg-orange-200 text-orange-600 px-2.5 py-1 rounded-full">Total</span>
           </div>
-          <p class="text-xs text-slate-400 mb-1">Khách hàng</p>
+          <p class="text-xs text-slate-600 mb-1">Khách hàng</p>
           <p class="text-2xl font-bold text-orange-500">{{ kpi.totalClients }}</p>
         </div>
       </div>
@@ -78,7 +78,7 @@
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <h2 class="font-semibold text-slate-800">Dự án gần đây</h2>
+            <h2 class="flex items-center gap-2 font-semibold text-slate-800"><BaseIcon :path="mdiHistory" size="25 "/>Dự án gần đây</h2>
             <RouterLink to="/projects" class="text-xs text-indigo-500 hover:underline font-medium">Xem tất cả</RouterLink>
           </div>
 
@@ -115,7 +115,7 @@
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
-            <h2 class="font-semibold text-slate-800">🏆 Top Khách hàng </h2>
+            <h2 class="flex items-center gap-2 font-semibold text-slate-800 "> <BaseIcon :path="mdiTrophyAward" size="25 "/> Top Khách hàng </h2>
           </div>
 
           <div v-if="topClients.length === 0" class="flex-1 flex justify-center items-center py-12 text-slate-400 text-sm">
@@ -158,6 +158,8 @@ import { useAuthStore } from '@/stores/auth.store.js'
 import { useProjectStore } from '@/stores/project.store.js'
 import { useInvoiceStore } from '@/stores/invoice.store.js'
 import { useClientStore } from '@/stores/client.store.js'
+import { mdiTimerSand , mdiCashMultiple , mdiHandClap , mdiRocketLaunch, mdiClipboardAccount , mdiTrophyAward , mdiHistory} from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 import AppLayout from '@/components/common/AppLayout.vue'
 import VueApexCharts from 'vue3-apexcharts'
 
