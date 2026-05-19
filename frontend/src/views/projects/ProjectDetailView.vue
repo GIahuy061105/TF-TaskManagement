@@ -1,42 +1,42 @@
 <template>
-  <div v-if="showMemberModal" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 px-4 backdrop-blur-sm" @click.self="showMemberModal = false">
-    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-8">
+  <div v-if="showMemberModal" class="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 flex items-center justify-center z-50 px-4 backdrop-blur-sm transition-colors" @click.self="showMemberModal = false">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md shadow-2xl p-8 border border-transparent dark:border-slate-700 transition-colors">
       <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-black text-slate-900">Thành viên Dự án</h3>
-        <button @click="showMemberModal = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl transition">&times;</button>
+        <h3 class="text-xl font-black text-slate-900 dark:text-white transition-colors">Thành viên Dự án</h3>
+        <button @click="showMemberModal = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold text-xl transition-colors">&times;</button>
       </div>
 
       <div class="space-y-3 max-h-60 overflow-y-auto mb-6 pr-2 custom-scrollbar">
-        <div v-for="pm in project?.members" :key="pm.userId" class="group flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-100 transition-colors">
+        <div v-for="pm in project?.members" :key="pm.userId" class="group flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-600 hover:border-indigo-100 dark:hover:border-indigo-500/50 transition-colors">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-white border border-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-sm">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 dark:from-indigo-900/50 to-white dark:to-slate-800 border border-indigo-50 dark:border-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black shadow-sm transition-colors">
               {{ pm.user?.fullName?.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <p class="text-sm font-bold text-slate-800">{{ pm.user?.fullName }}</p>
-              <p class="text-[10px] font-medium text-slate-400">{{ pm.user?.email }}</p>
+              <p class="text-sm font-bold text-slate-800 dark:text-white transition-colors">{{ pm.user?.fullName }}</p>
+              <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500 transition-colors">{{ pm.user?.email }}</p>
             </div>
           </div>
-          <button @click="handleRemoveMember(pm.userId)" class="opacity-0 group-hover:opacity-100 text-rose-500 text-xs font-bold hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-rose-100">
+          <button @click="handleRemoveMember(pm.userId)" class="opacity-0 group-hover:opacity-100 text-rose-500 dark:text-rose-400 text-xs font-bold hover:bg-rose-50 dark:hover:bg-rose-900/30 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-rose-100 dark:hover:border-rose-800/50">
             Gỡ
           </button>
         </div>
 
-        <div v-if="!project?.members?.length" class="text-center py-6 border-2 border-dashed border-slate-100 rounded-2xl">
-          <p class="text-sm font-semibold text-slate-400">Dự án này chưa có ai tham gia.</p>
+        <div v-if="!project?.members?.length" class="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-700 rounded-2xl transition-colors">
+          <p class="text-sm font-semibold text-slate-400 dark:text-slate-500">Dự án này chưa có ai tham gia.</p>
         </div>
       </div>
 
-      <div v-if="authStore.isAdmin" class="pt-6 border-t border-slate-100">
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Thêm từ Workspace</label>
+      <div v-if="authStore.isAdmin" class="pt-6 border-t border-slate-100 dark:border-slate-700 transition-colors">
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 transition-colors">Thêm từ Workspace</label>
         <div class="flex gap-2">
-          <select v-model="selectedUserIdToAdd" class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 font-medium text-slate-700 transition">
+          <select v-model="selectedUserIdToAdd" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/30 font-medium transition-colors">
             <option value="" disabled>-- Chọn nhân sự --</option>
             <option v-for="user in availableUsersToAdd" :key="user.userId" :value="user.userId">
               {{ user.user.fullName }}
             </option>
           </select>
-          <button @click="handleAddMember" :disabled="!selectedUserIdToAdd || loading" class="bg-indigo-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-md transition">
+          <button @click="handleAddMember" :disabled="!selectedUserIdToAdd || loading" class="bg-indigo-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 dark:disabled:bg-slate-600 shadow-md transition-colors">
             Thêm
           </button>
         </div>
@@ -46,8 +46,8 @@
 
   <AppLayout>
     <div class="p-8 max-w-[1600px] mx-auto h-full flex flex-col">
-      <div v-if="!project" class="flex flex-col items-center justify-center flex-1 text-slate-400 gap-4">
-        <div class="animate-spin text-4xl">⏳</div>
+      <div v-if="!project" class="flex flex-col items-center justify-center flex-1 text-slate-400 dark:text-slate-500 gap-4 transition-colors">
+        <div class="animate-spin text-4xl text-indigo-500 dark:text-indigo-400"><BaseIcon :path="mdiTimerSand" size="22"/></div>
         <p class="font-semibold tracking-wider">Đang tải dữ liệu dự án...</p>
       </div>
 
@@ -110,7 +110,8 @@ import ProjectHeader from '@/components/project/ProjectHeader.vue'
 import KanbanBoard from '@/components/project/KanbanBoard.vue'
 import TaskDetailModal from '@/components/project/TaskDetailModal.vue'
 import CreateTaskModal from '@/components/project/CreateTaskModal.vue'
-
+import {mdiTimerSand , mdiHomeCityOutline ,mdiBank} from '@mdi/js'
+import BaseIcon from '@/components/icon/BaseIcon.vue'
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()

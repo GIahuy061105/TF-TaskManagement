@@ -3,19 +3,18 @@
     <div
       v-for="column in columns"
       :key="column.status"
-      class="rounded-3xl border border-slate-100 p-5 flex flex-col transition-colors duration-300 shadow-sm"
+      class="rounded-3xl border p-5 flex flex-col transition-colors duration-300 shadow-sm border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
       :class="column.columnBg"
     >
       <div class="flex items-center justify-between mb-5 px-1">
         <div class="flex items-center gap-3">
           <BaseIcon :path="mdiCircle" size="12" :class="column.color.replace('bg-', 'text-')" />
-          <h3 class="font-black text-slate-800 tracking-tight">{{ column.label }}</h3>
+          <h3 class="font-black text-slate-800 dark:text-white tracking-tight">{{ column.label }}</h3>
         </div>
-        <span class="text-xs font-black text-slate-500 bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100">
+        <span class="text-xs font-black text-slate-500 dark:text-slate-300 bg-white dark:bg-slate-700 px-3 py-1 rounded-lg shadow-sm border border-slate-400 dark:border-slate-600">
           {{ taskColumns[column.status].length }}
         </span>
       </div>
-
       <draggable
         v-model="taskColumns[column.status]"
         :disabled="!isAdmin"
