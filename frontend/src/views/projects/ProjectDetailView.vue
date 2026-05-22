@@ -3,7 +3,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md shadow-2xl p-8 border border-transparent dark:border-slate-700 transition-colors">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-xl font-black text-slate-900 dark:text-white transition-colors">Thành viên Dự án</h3>
-        <button @click="showMemberModal = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold text-xl transition-colors">&times;</button>
+          <BaseButton variant="ghost" class="!w-8 !h-8 !p-0 !rounded-full !text-xl" @click="showMemberModal = false">&times;</BaseButton>
       </div>
 
       <div class="space-y-3 max-h-60 overflow-y-auto mb-6 pr-2 custom-scrollbar">
@@ -17,9 +17,9 @@
               <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500 transition-colors">{{ pm.user?.email }}</p>
             </div>
           </div>
-          <button @click="handleRemoveMember(pm.userId)" class="opacity-0 group-hover:opacity-100 text-rose-500 dark:text-rose-400 text-xs font-bold hover:bg-rose-50 dark:hover:bg-rose-900/30 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-rose-100 dark:hover:border-rose-800/50">
+          <BaseButton variant="dangerOutline" size="xs" class="opacity-0 group-hover:opacity-100" @click="handleRemoveMember(pm.userId)">
             Gỡ
-          </button>
+          </BaseButton>
         </div>
 
         <div v-if="!project?.members?.length" class="text-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-700 rounded-2xl transition-colors">
@@ -36,9 +36,9 @@
               {{ user.user.fullName }}
             </option>
           </select>
-          <button @click="handleAddMember" :disabled="!selectedUserIdToAdd || loading" class="bg-indigo-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 dark:disabled:bg-slate-600 shadow-md transition-colors">
+          <BaseButton variant="primary" size="md" :disabled="!selectedUserIdToAdd" :loading="loading" @click="handleAddMember">
             Thêm
-          </button>
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -112,6 +112,8 @@ import TaskDetailModal from '@/components/project/TaskDetailModal.vue'
 import CreateTaskModal from '@/components/project/CreateTaskModal.vue'
 import {mdiTimerSand , mdiHomeCityOutline ,mdiBank} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
+import { toast } from 'vue-sonner'
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
@@ -157,7 +159,7 @@ async function handleCreateTask(payload) {
     showModal.value = false
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Có lỗi xảy ra khi tạo task')
+    toast.error(err.response?.data?.message || 'Có lỗi xảy ra khi tạo task')
   } finally {
     loading.value = false
   }
@@ -170,7 +172,7 @@ async function handleUpdateTask(payload) {
     closeTaskDetail()
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Lỗi khi cập nhật Task')
+    toast.error(err.response?.data?.message || 'Lỗi khi cập nhật Task')
   } finally {
     loading.value = false
   }
@@ -190,7 +192,7 @@ async function handleRequestApproval(task) {
     closeTaskDetail()
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Lỗi khi yêu cầu phê duyệt')
+    toast.error(err.response?.data?.message || 'Lỗi khi yêu cầu phê duyệt')
   } finally {
     loading.value = false
   }
@@ -203,7 +205,7 @@ async function handleApproveTask(task) {
     closeTaskDetail()
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Lỗi khi phê duyệt Task')
+    toast.error(err.response?.data?.message || 'Lỗi khi phê duyệt Task')
   } finally {
     loading.value = false
   }
@@ -214,7 +216,7 @@ async function handleChangeProjectStatus(newStatus) {
     await projectStore.updateProject(route.params.id, { status: newStatus })
     await refreshProject()
   } catch (err) {
-    alert('Lỗi khi đổi trạng thái: ' + err.message)
+    toast.error('Lỗi khi đổi trạng thái: ' + err.message)
   }
 }
 async function handleChangeProjectVisibility(newVisibility) {
@@ -228,7 +230,7 @@ async function handleChangeProjectVisibility(newVisibility) {
     await projectStore.updateProject(route.params.id, { visibility: newVisibility });
     await refreshProject();
   } catch (err) {
-    alert('Lỗi khi đổi quyền truy cập: ' + err.message);
+    toast.error('Lỗi khi đổi quyền truy cập: ' + err.message);
   }
 }
 
@@ -238,7 +240,7 @@ async function handleDeleteProject() {
     await projectStore.deleteProject(route.params.id)
     router.push('/projects') // Xóa xong thì điều hướng về danh sách
   } catch (err) {
-    alert('Lỗi khi xóa dự án: ' + err.message)
+    toast.error('Lỗi khi xóa dự án: ' + err.message)
   }
 }
 const availableUsersToAdd = computed(() => {
@@ -255,7 +257,7 @@ async function handleAddMember() {
     selectedUserIdToAdd.value = '' // Reset thẻ select
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Có lỗi khi thêm thành viên')
+    toast.error(err.response?.data?.message || 'Có lỗi khi thêm thành viên')
   } finally {
     loading.value = false
   }
@@ -268,7 +270,7 @@ async function handleRemoveMember(userId) {
     await projectStore.removeProjectMember(route.params.id, userId)
     await refreshProject()
   } catch (err) {
-    alert(err.response?.data?.message || 'Có lỗi khi xóa thành viên')
+    toast.error(err.response?.data?.message || 'Có lỗi khi xóa thành viên')
   } finally {
     loading.value = false
   }

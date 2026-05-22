@@ -30,14 +30,15 @@
             <option value="PRIVATE">🔒 Riêng tư</option>
           </select>
 
-          <button
+          <BaseButton
             v-if="isAdmin"
-            @click="$emit('delete-project')"
-            class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors shadow-sm ml-auto xl:ml-0"
+            variant="dangerOutline"
+            class="!w-8 !h-8 !p-0 shadow-sm ml-auto xl:ml-0"
             title="Xóa dự án"
+            @click="$emit('delete-project')"
           >
             <BaseIcon :path="mdiDeleteOutline" size="18" />
-          </button>
+          </BaseButton>
         </div>
 
         <div class="flex items-center gap-3 mt-3">
@@ -63,24 +64,26 @@
               </div>
             </div>
 
-            <button
+            <BaseButton
               v-if="isAdmin"
-              @click="$emit('manage-members')"
-              class="w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors bg-white dark:bg-slate-800 ml-2 shadow-sm"
+              variant="ghost"
+              class="!w-10 !h-10 !p-0 !rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500 bg-white dark:bg-slate-800 shadow-sm ml-2"
               title="Quản lý thành viên"
+              @click="$emit('manage-members')"
             >
               <BaseIcon :path="mdiAccountPlusOutline" size="20" />
-            </button>
+            </BaseButton>
           </div>
         </div>
 
-        <button
+        <BaseButton
           v-if="!isViewer"
+          variant="primary"
+          class="!px-6 !py-3 whitespace-nowrap"
           @click="$emit('add-task')"
-          class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2"
         >
           <BaseIcon :path="mdiPlus" size="20" /> Tạo công việc
-        </button>
+        </BaseButton>
       </div>
     </div>
 
@@ -121,8 +124,8 @@
 <script setup>
 import { computed } from 'vue'
 import { mdiDeleteOutline, mdiOfficeBuilding, mdiPlus, mdiTrophy, mdiAccountPlusOutline } from '@mdi/js'
-import BaseIcon from '@/components/icon/BaseIcon.vue' // Điều chỉnh đường dẫn nếu cần
-
+import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 const props = defineProps({
   project: { type: Object, required: true },
   members: { type: Array, default: () => [] },

@@ -6,20 +6,18 @@
           <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">Dự án</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Quản lý và theo dõi tiến độ các dự án của bạn.</p>
         </div>
-        <button
-          v-if="authStore.isAdmin"
-          @click="showModal = true"
-          class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/20 hover:shadow-lg hover:shadow-indigo-300 dark:hover:shadow-indigo-900/40 hover:-translate-y-0.5"
-        >
+        <BaseButton v-if="authStore.isAdmin" variant="primary" size="md" @click="showModal = true">
           + Tạo dự án mới
-        </button>
+        </BaseButton>
       </div>
 
       <div v-if="projectStore.projects.length === 0" class="flex flex-col items-center justify-center py-24 bg-white/50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 transition-colors">
         <div class="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-4xl mb-4 text-indigo-500 dark:text-indigo-400 transition-colors"> <BaseIcon :path="mdiRocketLaunch" size="40"/></div>
         <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 transition-colors">Chưa có dự án nào</h3>
         <p class="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-4 transition-colors">Bắt đầu bằng cách tạo dự án đầu tiên cho team của bạn.</p>
-        <button v-if="authStore.isAdmin" @click="showModal = true" class="text-indigo-600 dark:text-indigo-400 font-bold text-sm bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">Tạo ngay</button>
+        <BaseButton v-if="authStore.isAdmin" variant="softPrimary" size="sm" @click="showModal = true">
+          Tạo ngay
+        </BaseButton>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -132,10 +130,12 @@
           </div>
 
           <div class="flex gap-3 pt-6 border-t border-slate-100 dark:border-slate-700 transition-colors">
-            <button type="button" @click="showModal = false" class="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Hủy</button>
-            <button type="submit" :disabled="loading" class="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition shadow-md hover:shadow-lg disabled:opacity-50">
-              {{ loading ? 'Hệ thống đang xử lý...' : 'Tạo dự án' }}
-            </button>
+            <BaseButton variant="outline" class="flex-1 !py-3.5" @click="showModal = false">
+              Hủy
+            </BaseButton>
+            <BaseButton type="submit" variant="primary" class="flex-1 !py-3.5" :loading="loading">
+              Tạo dự án
+            </BaseButton>
           </div>
         </form>
       </div>
@@ -150,12 +150,14 @@ import { useAuthStore } from '@/stores/auth.store.js'
 import { useClientStore } from '@/stores/client.store.js'
 import { mdiRocketLaunch , mdiFolder , mdiClipboardAccount, mdiTimerSand,mdiCreation ,mdiScriptTextOutline,mdiEarth, mdiLockOutline } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 import AppLayout from '@/components/common/AppLayout.vue'
-
+import { useThemeStore } from '@/stores/theme.store.js'
 const router = useRouter()
 const projectStore = useProjectStore()
 const clientStore = useClientStore()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 const showModal = ref(false)
 const loading = ref(false)
 const form = ref({ name: '', clientId: '', hourlyRate: '', deadline: '',color: '#6366f1', icon: '📁', description: '',visibility: 'PUBLIC' })

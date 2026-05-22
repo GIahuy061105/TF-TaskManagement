@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@mdi/js": "^7.4.47",
-    "resend": "^6.12.2"
+    "resend": "^6.12.2",
+    "vue-sonner": "^2.0.9"
   }
 }

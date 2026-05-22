@@ -36,9 +36,9 @@
             <BaseIcon :path="mdiAlert" size="20" class="shrink-0" />{{ error }} {{ error }}
           </p>
 
-          <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 mt-2">
-            {{ loading ? 'Đang thiết lập...' : 'Tạo tài khoản' }}
-          </button>
+          <BaseButton type="submit" variant="primary" size="lg"  block  :loading="loading"  class="mt-2" >
+            Tạo tài khoản
+          </BaseButton>
         </form>
 
         <form v-else-if="step === 'VERIFY'" @submit.prevent="handleVerify" class="space-y-6">
@@ -59,9 +59,9 @@
            <BaseIcon :path="mdiCheck" size="20" class="shrink-0" />{{ error }} {{ successMsg }}
           </p>
 
-          <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-emerald-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50">
-            {{ loading ? 'Đang kiểm tra...' : 'Xác nhận Email' }}
-          </button>
+          <BaseButton type="submit" variant="success" size="lg" block :loading="loading" >
+            Xác nhận Email
+          </BaseButton>
         </form>
 
         <div v-if="step === 'REGISTER'" class="mt-8 pt-6 border-t border-slate-100 text-center">
@@ -82,6 +82,8 @@ import { useAuthStore } from '@/stores/auth.store.js'
 import api from '@/api/index.js'
 import { mdiAccountPlusOutline , mdiAlert , mdiCheck} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
+import { toast } from 'vue-sonner'
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -109,7 +111,7 @@ async function handleVerify() {
   error.value = ''
   try {
     await api.post('/auth/verify-email', { email: form.value.email, otp: otp.value })
-    alert('✅ Xác thực thành công! Đang tự động đăng nhập...')
+    toast.success('✅ Xác thực thành công! Đang tự động đăng nhập...')
     await authStore.login(form.value.email, form.value.password)
     router.push('/dashboard')
   } catch (err) {

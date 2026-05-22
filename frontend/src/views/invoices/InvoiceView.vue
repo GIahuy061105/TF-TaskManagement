@@ -6,13 +6,9 @@
           <h1 class="text-3xl font-black text-slate-900 dark:text-white transition-colors tracking-tight">Hóa đơn</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 transition-colors mt-1">Quản lý chứng từ, theo dõi công nợ và doanh thu.</p>
         </div>
-        <button
-          v-if="authStore.isAdmin"
-          @click="openCreate"
-          class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/20 hover:shadow-lg hover:-translate-y-0.5"
-        >
+        <BaseButton v-if="authStore.isAdmin" variant="primary" @click="openCreate">
           + Tạo hóa đơn
-        </button>
+        </BaseButton>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -95,11 +91,32 @@
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex items-center justify-end gap-1.5" v-if="authStore.isAdmin">
-                    <button v-if="invoice.status === 'DRAFT'" @click="handleSend(invoice.id)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors font-black">Chốt & Gửi</button>
-                    <button v-if="invoice.status !== 'DRAFT'" @click="openView(invoice)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-black">Xem lại</button>
-                    <button v-if="invoice.status === 'SENT'" @click="handleMarkPaid(invoice.id)" class="text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors font-black">Đã thu tiền</button>
-                    <button v-if="invoice.status === 'DRAFT'" @click="openEdit(invoice)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"><BaseIcon :path="mdiPencil" size="20"/></button>
-                    <button v-if="invoice.status === 'DRAFT'" @click="handleDelete(invoice.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors"><BaseIcon :path="mdiTrashCan" size="20"/></button>
+                    <template v-if="invoice.status === 'DRAFT'">
+                          <BaseButton variant="softPrimary" size="sm" @click="handleSend(invoice.id)">
+                            Chốt & Gửi
+                          </BaseButton>
+                          <BaseButton variant="outline" class="!w-8 !h-8 !p-0" @click="openEdit(invoice)">
+                            <BaseIcon :path="mdiPencil" size="20"/>
+                          </BaseButton>
+                          <BaseButton variant="dangerOutline" class="!w-8 !h-8 !p-0" @click="handleDelete(invoice.id)">
+                            <BaseIcon :path="mdiTrashCan" size="20"/>
+                          </BaseButton>
+                        </template>
+                        <template v-else-if="invoice.status === 'SENT'">
+                          <BaseButton variant="success" size="sm" @click="handleMarkPaid(invoice.id)">
+                            Đã thu tiền
+                          </BaseButton>
+                          <BaseButton variant="outline" size="sm" @click="openView(invoice)">
+                            Xem lại
+                          </BaseButton>
+                        </template>
+                        <template v-else-if="invoice.status === 'PAID'">
+                          <BaseButton variant="outline" size="sm" @click="openView(invoice)">
+                            Xem lại
+                          </BaseButton>
+                        </template>
+                    <BaseButton variant="outline" class="!w-8 !h-8 !p-0" @click="openEdit(invoice)"><BaseIcon :path="mdiPencil" size="20"/></BaseButton>
+                    <BaseButton variant="dangerOutline" class="!w-8 !h-8 !p-0" @click="handleDelete(invoice.id)"><BaseIcon :path="mdiTrashCan" size="20"/></BaseButton>
                   </div>
                 </td>
               </tr>
@@ -116,7 +133,7 @@
             <span class="text-indigo-500 dark:text-indigo-400"><BaseIcon :path="mdiInvoice" size="20"/></span>
             {{ isViewing ? 'Chi tiết Hóa đơn' : (editingInvoice ? 'Chỉnh sửa Hóa đơn' : 'Tạo hóa đơn mới') }}
           </h3>
-          <button @click="closeModal" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold text-xl transition-colors">&times;</button>
+          <BaseButton variant="ghost" class="!w-8 !h-8 !p-0 !rounded-full !text-xl" @click="closeModal" title="Đóng"> &times; </BaseButton>
         </div>
 
         <form @submit.prevent="handleSubmit" class="p-8 space-y-6 flex-1 overflow-y-auto">
@@ -161,9 +178,9 @@
             <div>
               <div class="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-700 pb-3 transition-colors">
                 <label class="block text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider transition-colors">Hàng hóa / Dịch vụ</label>
-                <button type="button" @click="addLineItem" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors px-3 py-2 rounded-lg flex items-center gap-1">
+                <BaseButton type="button" variant="softPrimary" size="sm" @click="addLineItem">
                   <span>+</span> Thêm dòng
-                </button>
+                </BaseButton>
               </div>
 
               <div class="space-y-3">
@@ -180,9 +197,9 @@
                   <input v-model.number="item.quantity" type="number" min="1" class="col-span-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/30 outline-none transition-colors text-sm text-center font-bold" required />
                   <input v-model.number="item.unitPrice" type="number" min="0" :step="priceStep" class="col-span-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/30 outline-none transition-colors text-sm font-mono font-bold text-right" required />
 
-                  <button type="button" @click="removeLineItem(index)" class="col-span-1 text-slate-300 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 w-10 h-10 rounded-xl flex justify-center items-center transition-colors opacity-50 group-hover:opacity-100">
+                  <BaseButton type="button" variant="dangerOutline" class="col-span-1 !w-10 !h-10 !p-0" @click="removeLineItem(index)">
                     <BaseIcon :path="mdiTrashCan" size="20"/>
-                  </button>
+                  </BaseButton>
                 </div>
               </div>
             </div>
@@ -226,20 +243,15 @@
           </fieldset>
 
           <div class="flex gap-4 pt-6 border-t border-slate-100 dark:border-slate-700 sticky bottom-0 bg-white dark:bg-slate-800 pb-2 transition-colors z-10">
-            <button type="button" @click="closeModal" class="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              {{ isViewing ? 'Đóng cửa sổ' : 'Hủy bỏ' }}
-            </button>
-            <button
-              v-if="isViewing"
-              type="button"
-              @click="downloadPDF"
-              class="flex-1 py-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 text-sm font-bold transition-colors flex justify-center items-center gap-2 border border-red-100 dark:border-red-800/50"
-            >
+            <BaseButton variant="outline" class="flex-1 !py-3.5" @click="closeModal">{{ isViewing ? 'Đóng cửa sổ' : 'Hủy bỏ' }}</BaseButton>
+
+            <BaseButton v-if="isViewing" variant="dangerOutline" class="flex-1 !py-3.5" @click="downloadPDF">
               <BaseIcon :path="mdiFilePdfBox" size="20"/> Tải bản in PDF
-            </button>
-            <button v-if="!isViewing" type="submit" :disabled="loading" class="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors shadow-md hover:shadow-lg disabled:opacity-50">
-              {{ loading ? 'Hệ thống đang xử lý...' : (editingInvoice ? 'Cập nhật Hóa Đơn' : 'Lưu & Tạo Hóa Đơn') }}
-            </button>
+            </BaseButton>
+
+            <BaseButton v-if="!isViewing" type="submit" variant="primary" class="flex-1 !py-3.5" :loading="loading">
+              {{ loading ? 'Đang xử lý...' : (editingInvoice ? 'Cập nhật HĐ' : 'Lưu & Tạo HĐ') }}
+            </BaseButton>
           </div>
         </form>
       </div>
@@ -335,7 +347,9 @@ import AppLayout from '@/components/common/AppLayout.vue'
 import { useSettingStore } from '@/stores/setting.store.js'
 import { mdiTimerSand , mdiCashMultiple , mdiInvoiceCheck , mdiInvoice, mdiInvoiceList , mdiFolder , mdiPencil , mdiTrashCan , mdiFilePdfBox} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 import html2pdf from 'html2pdf.js'
+import { toast } from 'vue-sonner'
 const router = useRouter()
 const authStore = useAuthStore()
 const invoiceStore = useInvoiceStore()
@@ -416,7 +430,7 @@ async function handleSubmit() {
 
      closeModal()
    } catch (err) {
-     alert(err.response?.data?.message || 'Lỗi khi lưu hóa đơn')
+     toast.error(err.response?.data?.message || 'Lỗi khi lưu hóa đơn')
    } finally {
      loading.value = false
    }

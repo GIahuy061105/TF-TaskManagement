@@ -8,7 +8,7 @@
         <h3 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 transition-colors">
             Thêm Task Mới <BaseIcon :path="mdiCreation" size="22" class="text-amber-400" />
         </h3>
-        <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-bold text-xl transition-colors">&times;</button>
+        <BaseButton variant="ghost" class="!w-8 !h-8 !p-0 !rounded-full !text-xl" @click="$emit('close')">&times;</BaseButton>
       </div>
 
       <form @submit.prevent="handleSubmit" class="p-8 space-y-6">
@@ -67,10 +67,12 @@
         </div>
 
         <div class="flex gap-4 pt-6 border-t border-slate-100 dark:border-slate-700 transition-colors">
-          <button type="button" @click="$emit('close')" class="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Hủy bỏ</button>
-          <button type="submit" :disabled="loading" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold transition shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50">
-            {{ loading ? 'Hệ thống đang xử lý...' : 'Tạo Task' }}
-          </button>
+          <BaseButton variant="outline" class="flex-1 !py-3.5" @click="$emit('close')">
+              Hủy bỏ
+          </BaseButton>
+          <BaseButton type="submit" variant="primary" class="flex-1 !py-3.5" :loading="loading">
+              Tạo Task
+          </BaseButton>
         </div>
       </form>
     </div>
@@ -80,6 +82,7 @@
 <script setup>
 import { ref } from 'vue'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 import { mdiClose, mdiCreation } from '@mdi/js'
 defineProps({
   members: { type: Array, default: () => [] },

@@ -19,37 +19,32 @@
         </span>
 
         <div class="flex items-center gap-3">
-          <button v-if="!isEditing && isAdmin" @click="isEditing = true"
-            class="text-sm font-bold text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-lg">
-            <BaseIcon :path="mdiPencil" size="16" /> Sửa
-          </button>
+          <BaseButton v-if="!isEditing && isAdmin" variant="softPrimary" size="sm" @click="isEditing = true">
+              <BaseIcon :path="mdiPencil" size="16" /> Sửa
+            </BaseButton>
 
-          <button v-if="!isAdmin && task.status !== 'DONE' && !task.isPendingApproval"
-            @click="$emit('request-approval', task)"
-            class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
-            <BaseIcon :path="mdiTimerSand" size="16" /> Gửi yêu cầu duyệt
-          </button>
+            <BaseButton v-if="!isAdmin && task.status !== 'DONE' && !task.isPendingApproval" variant="softWarning" size="sm" @click="$emit('request-approval', task)">
+              <BaseIcon :path="mdiTimerSand" size="16" /> Gửi yêu cầu duyệt
+            </BaseButton>
 
-          <span v-if="task.isPendingApproval && !isAdmin"
-            class="text-xs font-bold text-amber-500 dark:text-amber-400 italic bg-amber-50 dark:bg-amber-900/30 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800">
-            Đang chờ Admin duyệt...
-          </span>
+            <span
+              v-if="task.isPendingApproval && !isAdmin"
+              class="text-xs font-bold text-amber-500 dark:text-amber-400 italic bg-amber-50 dark:bg-amber-900/30 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800"
+            >
+              Đang chờ Admin duyệt...
+            </span>
 
-          <button v-if="isAdmin && task.isPendingApproval"
-            @click="$emit('approve-task', task)"
-            class="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
-            <BaseIcon :path="mdiCheckDecagram" size="16" /> Phê duyệt Task
-          </button>
+            <BaseButton v-if="isAdmin && task.isPendingApproval" variant="success" size="sm" @click="$emit('approve-task', task)">
+              <BaseIcon :path="mdiCheckDecagram" size="16" /> Phê duyệt Task
+            </BaseButton>
 
-          <button v-if="isAdmin" @click="$emit('delete-task', task)"
-            class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition shadow-sm">
-            <BaseIcon :path="mdiDeleteOutline" size="18" />
-          </button>
+            <BaseButton v-if="isAdmin" variant="dangerOutline" class="!w-8 !h-8 !p-0 shadow-sm" @click="$emit('delete-task', task)">
+              <BaseIcon :path="mdiDeleteOutline" size="18" />
+            </BaseButton>
 
-          <button @click="$emit('close')"
-            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition ml-2">
-            <BaseIcon :path="mdiClose" size="24" />
-          </button>
+            <BaseButton variant="ghost" class="!w-8 !h-8 !p-0 !rounded-full ml-2" @click="$emit('close')">
+              <BaseIcon :path="mdiClose" size="24" />
+            </BaseButton>
         </div>
       </div>
 
@@ -148,12 +143,14 @@
                   </a>
                   <p class="text-[10px] text-slate-400 dark:text-slate-500">{{ file.fileSize ? (file.fileSize / 1024 / 1024).toFixed(2) : 0 }} MB</p>
                 </div>
-                <button
+                <BaseButton
                   v-if="!authStore.isViewer"
+                  variant="ghost"
+                  class="!w-8 !h-8 !p-0 opacity-0 group-hover:opacity-100 hover:!bg-rose-50 dark:hover:!bg-rose-900/30 hover:!text-rose-500 dark:hover:!text-rose-400 transition-all"
                   @click="removeFile(index, file)"
-                  class="w-8 h-8 rounded-lg text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                >
                   <BaseIcon :path="mdiDeleteOutline" size="18" />
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -200,12 +197,15 @@
                   class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none text-sm resize-none pr-14 transition-colors font-medium shadow-sm"
                   :disabled="isSubmittingComment"
                 ></textarea>
-                <button
+                <BaseButton
+                  variant="primary"
+                  class="!absolute right-2 bottom-2 !w-9 !h-9 !p-0 shadow-sm"
+                  :disabled="!newComment.trim()"
+                  :loading="isSubmittingComment"
                   @click="submitComment"
-                  :disabled="!newComment.trim() || isSubmittingComment"
-                  class="absolute right-2 bottom-2 w-9 h-9 flex items-center justify-center bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition shadow-sm">
+                >
                   <BaseIcon :path="mdiSend" size="18" class="transform -rotate-12" />
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -281,14 +281,12 @@
           </div>
 
           <div class="flex gap-4 pt-6 border-t border-slate-100 dark:border-slate-700 transition-colors">
-            <button type="button" @click="isEditing = false"
-              class="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              Hủy bỏ
-            </button>
-            <button type="submit" :disabled="loading"
-              class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold transition shadow-md hover:shadow-lg disabled:opacity-50 hover:-translate-y-0.5">
-              {{ loading ? 'Đang lưu...' : 'Lưu thay đổi' }}
-            </button>
+            <BaseButton variant="outline" class="flex-1 !py-3.5" @click="isEditing = false">
+                Hủy bỏ
+              </BaseButton>
+              <BaseButton type="submit" variant="primary" class="flex-1 !py-3.5" :loading="loading">
+                Lưu thay đổi
+              </BaseButton>
           </div>
         </form>
 
@@ -308,7 +306,9 @@ import {
   mdiFileDocumentOutline, mdiFilePdfBox, mdiImageOutline, mdiZipBoxOutline, mdiFileWordBox, mdiFileExcelBox
 } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 
+import { toast } from 'vue-sonner'
 const props = defineProps({
   task: { type: Object, required: true },
   members: { type: Array, default: () => [] },
@@ -360,7 +360,7 @@ async function submitComment() {
     comments.value.push(created)
     newComment.value = ''
   } catch (err) {
-    alert('Lỗi khi gửi bình luận!')
+    toast.error('Lỗi khi gửi bình luận!')
   } finally {
     isSubmittingComment.value = false
   }
@@ -435,7 +435,7 @@ async function addFiles(files) {
         attachments.value.unshift(newFile);
       } catch (error) {
         console.error("Lỗi upload file Cloudinary:", error);
-        alert(`Không thể tải lên file ${file.name}`);
+        toast.error(`Không thể tải lên file ${file.name}`);
       }
     }
   }
@@ -448,7 +448,7 @@ async function removeFile(index, file) {
     attachments.value.splice(index, 1);
   } catch (error) {
     console.error("Lỗi khi xóa file:", error);
-    alert("Không thể xóa file từ hệ thống lưu trữ!");
+    toast.error("Không thể xóa file từ hệ thống lưu trữ!");
   }
 }
 </script>

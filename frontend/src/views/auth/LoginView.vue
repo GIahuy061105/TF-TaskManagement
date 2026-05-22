@@ -27,7 +27,9 @@
           <div>
             <div class="flex justify-between items-center mb-2 pl-1 pr-1">
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Mật khẩu</label>
-              <button type="button" @click="step = 'FORGOT'; error = ''; successMsg = ''" class="text-xs font-bold text-indigo-600 hover:underline">Quên mật khẩu?</button>
+              <BaseButton variant="ghost"  class="!p-0 !h-auto hover:!bg-transparent text-xs !text-indigo-600 hover:underline" @click="step = 'FORGOT'; error = ''">
+                Quên mật khẩu?
+              </BaseButton>
             </div>
             <input v-model="form.password" type="password" placeholder="••••••••" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium outline-none text-slate-800" required />
           </div>
@@ -35,10 +37,11 @@
           <p v-if="error" class="text-rose-500 text-sm font-bold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100 flex items-center gap-2">
             <BaseIcon :path="mdiAlert" size="20" class="shrink-0" />{{ error }}
           </p>
-
-          <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 mt-2">
-            {{ loading ? 'Đang xác thực...' : 'Đăng nhập' }}
-          </button>
+          <div class="w-full">
+          <BaseButton type="submit"  variant="primary"  size="lg"  block :loading="loading" class="mt-2 whitespace-nowrap" >
+            Đăng nhập
+          </BaseButton>
+          </div>
 
           <div class="mt-6">
             <div class="relative mb-4">
@@ -48,14 +51,12 @@
               </div>
             </div>
 
-            <button
-              type="button"
-              @click="handleGoogleLogin"
-              class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition font-bold text-sm text-slate-700"
-            >
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google" />
-              Đăng nhập với Google
-            </button>
+            <BaseButton  type="button"  variant="outline"  size="lg"  block  @click="handleGoogleLogin" class="!text-slate-700 hover:!text-slate-900" >
+              <div class="flex items-center justify-center gap-3 w-full">
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 shrink-0" alt="Google" />
+                  <span class="font-bold">Đăng nhập với Google</span>
+                </div>
+            </BaseButton>
           </div>
         </form>
 
@@ -70,10 +71,12 @@
 
           <p v-if="error" class="text-rose-500 text-sm font-bold">{{ error }}</p>
 
-          <button type="submit" :disabled="loading" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition shadow-lg disabled:opacity-50">
-            {{ loading ? 'Đang gửi mã...' : 'Gửi mã OTP khôi phục' }}
-          </button>
-          <button type="button" @click="step = 'LOGIN'; error = ''" class="w-full text-slate-500 font-bold text-sm hover:text-slate-800 transition">Quay lại đăng nhập</button>
+          <BaseButton type="submit" variant="primary" size="lg" block :loading="loading">
+            Gửi mã OTP khôi phục
+          </BaseButton>
+          <BaseButton type="button" variant="ghost" size="md" block @click="step = 'LOGIN'; error = ''" class="!text-slate-500 hover:!text-slate-800 font-bold">
+            Quay lại đăng nhập
+          </BaseButton>
         </form>
 
         <form v-else-if="step === 'RESET'" @submit.prevent="handleResetPassword" class="space-y-5">
@@ -96,9 +99,9 @@
 
           <p v-if="error" class="text-rose-500 text-sm font-bold">{{ error }}</p>
 
-          <button type="submit" :disabled="loading" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition shadow-lg disabled:opacity-50">
-            {{ loading ? 'Đang xử lý...' : 'Xác nhận đổi mật khẩu' }}
-          </button>
+          <BaseButton type="submit" variant="success" size="lg" block :loading="loading">
+            Xác nhận đổi mật khẩu
+          </BaseButton>
         </form>
 
         <form v-else-if="step === 'VERIFY'" @submit.prevent="handleVerify" class="space-y-6">
@@ -114,9 +117,9 @@
 
           <p v-if="error" class="text-rose-500 text-sm font-bold">{{ error }}</p>
 
-          <button type="submit" :disabled="loading" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition shadow-lg disabled:opacity-50">
-            {{ loading ? 'Đang kiểm tra...' : 'Xác nhận Email' }}
-          </button>
+          <BaseButton type="submit" variant="primary" size="lg" block :loading="loading">
+            Xác nhận Email
+          </BaseButton>
         </form>
 
         <div v-if="step === 'LOGIN'" class="mt-8 pt-6 border-t border-slate-100 text-center">
@@ -138,6 +141,8 @@ import api from '@/api/index.js'
 import { decodeCredential, googleTokenLogin } from 'vue3-google-login'
 import { mdiLogin , mdiAlert } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
+import { toast } from 'vue-sonner'
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -153,7 +158,7 @@ const callbackGoogle = async (response) => {
   loading.value = true
   try {
     await authStore.loginWithGoogle(response.credential)
-    alert('✅ Đăng nhập Google thành công!')
+    toast.success('✅ Đăng nhập Google thành công!')
     router.push('/dashboard')
   } catch (err) {
     error.value = 'Lỗi kết nối tài khoản Google.'
@@ -172,8 +177,10 @@ async function handleLogin() {
     if (msg.includes('chưa được xác thực') || err.response?.data?.code === 'NOT_VERIFIED') {
       step.value = 'VERIFY'
       error.value = 'Tài khoản chưa xác thực!'
+      toast.error('Tài khoản chưa xác thực!')
     } else {
       error.value = msg
+      toast.error(msg)
     }
   } finally {
     loading.value = false
@@ -184,11 +191,12 @@ async function handleVerify() {
   error.value = ''
   try {
     await api.post('/auth/verify-email', { email: form.value.email, otp: otp.value })
-    alert('✅ Xác nhận thành công! Đang đăng nhập...')
+    toast.success('✅ Xác nhận thành công! Đang đăng nhập...')
     step.value = 'LOGIN' // Quay lại bước login để chạy tiếp
     await handleLogin()  // Tự động gọi lại đăng nhập
   } catch (err) {
     error.value = err.response?.data?.message || 'Mã xác thực không đúng!'
+    toast.error(error.value)
   } finally {
     loading.value = false
   }
@@ -204,6 +212,7 @@ async function handleForgotPassword() {
     confirmPassword.value = ''
   } catch (err) {
     error.value = err.response?.data?.message || 'Không tìm thấy Email này!'
+    toast.error(error.value)
   } finally {
     loading.value = false
   }
@@ -211,19 +220,21 @@ async function handleForgotPassword() {
 async function handleResetPassword() {
   if (newPassword.value !== confirmPassword.value) {
     error.value = 'Mật khẩu xác nhận không khớp!'
+    toast.error(error.value)
     return
   }
   loading.value = true
   error.value = ''
   try {
     await api.post('/auth/reset-password', { email: form.value.email, otp: otp.value, newPassword: newPassword.value })
-    alert('✅ Đổi mật khẩu thành công! Vui lòng đăng nhập lại.')
+    toast.success('✅ Đổi mật khẩu thành công! Vui lòng đăng nhập lại.')
     step.value = 'LOGIN'
     form.value.password = ''
     newPassword.value = ''
     confirmPassword.value = ''
   } catch (err) {
     error.value = err.response?.data?.message || 'Mã OTP không đúng hoặc đã hết hạn!'
+    toast.error(error.value)
   } finally {
     loading.value = false
   }
@@ -239,11 +250,12 @@ async function handleGoogleLogin() {
       accessToken: response.access_token
     })
     await authStore.loginWithGoogle(res.data)
-    alert('✅ Đăng nhập Google thành công!')
+    toast.success('✅ Đăng nhập Google thành công!')
     router.push('/dashboard')
   } catch (err) {
     console.error("Chi tiết lỗi:", err)
     error.value = err.response?.data?.message || 'Đăng nhập Google thất bại'
+    toast.error(error.value)
   } finally {
     loading.value = false
   }

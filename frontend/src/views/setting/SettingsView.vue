@@ -20,9 +20,9 @@
             </div>
             <div>
               <input type="file" ref="fileInput" class="hidden" @change="uploadLogo" accept="image/*" />
-              <button type="button" @click="$refs.fileInput.click()" :disabled="isUploading" class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors shadow-sm disabled:opacity-50">
+              <BaseButton type="button" variant="outline" size="sm" :loading="isUploading" @click="$refs.fileInput.click()">
                 {{ isUploading ? 'Đang tải lên...' : 'Tải Logo lên' }}
-              </button>
+              </BaseButton>
               <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-medium transition-colors">Hỗ trợ PNG, JPG (Nên dùng nền trong suốt). Tối đa 2MB.</p>
             </div>
           </div>
@@ -72,9 +72,9 @@
         </div>
 
         <div class="flex justify-end pt-4">
-          <button type="submit" :disabled="isSaving" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-8 py-3.5 rounded-xl transition shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50">
-            {{ isSaving ? 'Đang lưu...' : 'Lưu cài đặt' }}
-          </button>
+          <BaseButton type="submit" variant="primary"  size="md" :loading="isSaving" class="!px-8 !py-3.5">
+              {{ isSaving ? 'Đang lưu...' : 'Lưu cài đặt' }}
+          </BaseButton>
         </div>
       </form>
     </div>
@@ -86,6 +86,8 @@ import AppLayout from '@/components/common/AppLayout.vue'
 import { useSettingStore } from '@/stores/setting.store.js'
 import {mdiTimerSand , mdiHomeCityOutline ,mdiBank} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
+import { toast } from 'vue-sonner'
 const settingStore = useSettingStore()
 const form = ref(null)
 const isUploading = ref(false)
@@ -116,7 +118,7 @@ async function uploadLogo(e) {
 
     form.value.logoUrl = data.secure_url
   } catch (error) {
-    alert('Lỗi tải ảnh lên!')
+    toast.error('Lỗi tải ảnh lên!')
   } finally {
     isUploading.value = false
     e.target.value = '' // Reset input
@@ -127,9 +129,9 @@ async function saveSettings() {
   isSaving.value = true
   try {
     await settingStore.updateSettings(form.value)
-    alert('✅ Lưu cấu hình doanh nghiệp thành công!')
+    toast.success('✅ Lưu cấu hình doanh nghiệp thành công!')
   } catch (error) {
-    alert('Lỗi khi lưu cài đặt!')
+    toast.error('Lỗi khi lưu cài đặt!')
   } finally {
     isSaving.value = false
   }

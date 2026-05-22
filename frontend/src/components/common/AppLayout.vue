@@ -8,17 +8,13 @@
           Task<span class="text-indigo-500 dark:text-indigo-400">Flow</span>
         </span>
         <div class="flex items-center gap-3">
-            <button
-              @click="themeStore.toggleTheme"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              title="Chuyển đổi giao diện"
-            >
+            <BaseButton variant="ghost" class="!p-1.5 hover:text-indigo-500 dark:hover:text-indigo-400"title="Chuyển đổi giao diện" @click="themeStore.toggleTheme" >
               <BaseIcon :path="themeStore.isDark ? mdiWhiteBalanceSunny : mdiWeatherNight" size="22" />
-            </button>
-            <button v-if="invitations.length > 0" @click="showInviteModal = true" class="relative p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            </BaseButton>
+            <BaseButton v-if="invitations.length > 0" variant="ghost" class="relative !p-1.5" @click="showInviteModal = true">
               <BaseIcon :path="mdiBell" size="22" class="text-slate-500 dark:text-slate-400" />
               <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-            </button>
+            </BaseButton>
           </div>
         </div>
 
@@ -38,12 +34,9 @@
           <span>{{ item.label }}</span>
         </RouterLink>
         <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-          <button
-            @click="showInviteForm = true"
-            class="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2"
-          >
+          <BaseButton variant="primary" size="sm" block @click="showInviteForm = true">
             <span>+</span> Mời thành viên
-          </button>
+          </BaseButton>
         </div>
 
         <div v-if="showInviteForm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -73,19 +66,12 @@
               </div>
 
               <div class="flex gap-3 pt-2">
-                <button
-                  @click="handleSendInvite"
-                  :disabled="isSending"
-                  class="flex-1 bg-indigo-600 text-white py-2 rounded-xl font-bold text-sm hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-600"
-                >
-                  {{ isSending ? 'Đang gửi...' : 'Gửi lời mời' }}
-                </button>
-                <button
-                  @click="showInviteForm = false"
-                  class="px-4 py-2 text-slate-500 dark:text-slate-400 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                >
+                <BaseButton variant="primary" :loading="isSending" class="flex-1" @click="handleSendInvite">
+                  Gửi lời mời
+                </BaseButton>
+                <BaseButton variant="ghost" class="px-4" @click="showInviteForm = false">
                   Hủy
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -117,13 +103,9 @@
               {{ initial }}
             </div>
 
-            <button
-              @click="handleLogout"
-              class="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-              title="Đăng xuất"
-            >
+            <BaseButton variant="ghost" title="Đăng xuất" @click="handleLogout">
               <BaseIcon :path="mdiLogoutVariant" size="20" />
-            </button>
+            </BaseButton>
           </div>
           <div class="space-y-1">
             <p class="text-sm font-bold text-slate-900 dark:text-white truncate transition-colors">
@@ -149,7 +131,7 @@
       <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl transition-colors duration-300 border border-transparent dark:border-slate-700">
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-bold text-lg text-slate-900 dark:text-white">Lời mời tham gia</h3>
-          <button @click="showInviteModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-2xl leading-none transition-colors">&times;</button>
+            <BaseButton variant="ghost" class="!p-1 !text-2xl leading-none" @click="showInviteModal = false" > &times; </BaseButton>
         </div>
 
         <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
@@ -167,18 +149,12 @@
             </div>
 
             <div class="flex gap-2 shrink-0">
-              <button
-                @click="acceptInvite(invite.token)"
-                class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-700 transition shadow-sm"
-              >
+              <BaseButton variant="primary" size="xs" @click="acceptInvite(invite.token)">
                 Chấp nhận
-              </button>
-              <button
-                @click="declineInvite(invite.token)"
-                class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-200 text-[10px] px-3 py-1.5 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
-              >
+              </BaseButton>
+              <BaseButton variant="outline" size="xs" @click="declineInvite(invite.token)">
                 Từ chối
-              </button>
+              </BaseButton>
             </div>
           </div>
           <div v-if="invitations.length === 0" class="text-center py-8">
@@ -201,7 +177,9 @@ import api from '@/api/index.js'
 import { mdiViewDashboard, mdiProjectorScreen, mdiAccountGroup, mdiFileDocumentOutline,
          mdiCog, mdiPlus, mdiBell,mdiLogoutVariant , mdiWeatherNight, mdiWhiteBalanceSunny } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue'
 import { useThemeStore } from '@/stores/theme.store.js'
+import { toast } from 'vue-sonner'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -241,11 +219,11 @@ async function acceptInvite(token) {
   try {
     await api.post(`/invitations/${token}/accept`)
     await authStore.checkAuth()
-    alert('Đã gia nhập Workspace mới!')
+    toast.success('Đã gia nhập Workspace mới!')
     showInviteModal.value = false
     window.location.reload()
   } catch (err) {
-    alert(err.response?.data?.message || 'Lỗi khi chấp nhận')
+    toast.error(err.response?.data?.message || 'Lỗi khi chấp nhận')
   }
 }
 async function declineInvite(token) {
@@ -256,7 +234,7 @@ async function declineInvite(token) {
       showInviteModal.value = false
     }
   } catch (err) {
-    alert(err.response?.data?.message || 'Lỗi khi từ chối lời mời')
+    toast.error(err.response?.data?.message || 'Lỗi khi từ chối lời mời')
   }
 }
 
@@ -265,7 +243,7 @@ async function handleLogout() {
   router.push('/login')
 }
 async function handleSendInvite() {
-  if (!inviteEmail.value) return alert('Vui lòng nhập email')
+  if (!inviteEmail.value) return toast.warning('Vui lòng nhập email')
 
   isSending.value = true
   try {
@@ -273,12 +251,12 @@ async function handleSendInvite() {
       email: inviteEmail.value,
       role: inviteRole.value
     })
-    alert('Đã gửi lời mời thành công!')
+    toast.success('Đã gửi lời mời thành công!')
     inviteEmail.value = ''
     inviteRole.value = 'MEMBER'
     showInviteForm.value = false
   } catch (err) {
-    alert(err.response?.data?.message || 'Không thể gửi lời mời')
+    toast.error(err.response?.data?.message || 'Không thể gửi lời mời')
   } finally {
     isSending.value = false
   }

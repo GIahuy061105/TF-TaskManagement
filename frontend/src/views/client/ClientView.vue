@@ -6,13 +6,14 @@
           <h1 class="text-3xl font-black text-slate-900 dark:text-white transition-colors tracking-tight">Khách hàng</h1>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors">Quản lý danh bạ đối tác và thông tin xuất hóa đơn.</p>
         </div>
-        <button
+        <BaseButton
           v-if="authStore.isAdmin"
+          variant="primary"
+          size="md"
           @click="showModal = true"
-          class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/20 hover:shadow-lg hover:-translate-y-0.5"
         >
           + Thêm đối tác
-        </button>
+        </BaseButton>
       </div>
 
       <div v-if="clientStore.clients.length === 0" class="flex flex-col items-center justify-center py-24 bg-white/50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 transition-colors">
@@ -30,8 +31,12 @@
           class="group bg-white dark:bg-slate-800 rounded-3xl border border-slate-500 dark:border-slate-700 p-6 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 transition-all duration-300 flex flex-col h-full relative"
         >
           <div v-if="authStore.isAdmin" class="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button @click="openEdit(client)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors" title="Sửa"><BaseIcon :path="mdiPencil" size="20"/></button>
-            <button @click="handleDelete(client.id)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors" title="Xóa"><BaseIcon :path="mdiTrashCan" size="20"/></button>
+            <BaseButton variant="outline" size="sm" class="!w-8 !h-8 !p-0" title="Sửa" @click="openEdit(client)">
+              <BaseIcon :path="mdiPencil" size="20"/>
+            </BaseButton>
+            <BaseButton variant="dangerOutline" size="sm" class="!w-8 !h-8 !p-0" title="Xóa" @click="handleDelete(client.id)">
+              <BaseIcon :path="mdiTrashCan" size="20"/>
+            </BaseButton>
           </div>
 
           <div class="flex items-center gap-4 mb-6">
@@ -126,10 +131,10 @@
             </div>
           </div>
           <div class="flex gap-3 pt-4">
-            <button type="button" @click="closeModal" class="flex-1 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Hủy</button>
-            <button type="submit" :disabled="loading" class="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition shadow-md hover:shadow-lg disabled:opacity-50">
+            <BaseButton variant="outline" class="flex-1 !py-3.5" @click="closeModal">Hủy</BaseButton>
+            <BaseButton type="submit" variant="primary" class="flex-1 !py-3.5" :loading="loading">
               {{ loading ? 'Đang lưu...' : (editingClient ? 'Cập nhật' : 'Lưu khách hàng') }}
-            </button>
+            </BaseButton>
           </div>
         </form>
       </div>
@@ -145,7 +150,7 @@ import { useClientStore } from '@/stores/client.store.js'
 import AppLayout from '@/components/common/AppLayout.vue'
 import { mdiHandshakeOutline , mdiEmail , mdiPhone , mdiTownHall , mdiFolder ,mdiInvoice , mdiTrashCan, mdiPencil} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
-
+import BaseButton from '@/components/icon/BaseButton.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

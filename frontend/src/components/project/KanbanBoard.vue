@@ -38,6 +38,7 @@ import draggable from 'vuedraggable'
 import TaskCard from './TaskCard.vue'
 import { mdiCircle } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import { toast } from 'vue-sonner'
 const props = defineProps({
   tasks: { type: Array, default: () => [] },
   isAdmin: { type: Boolean, default: false }
@@ -65,7 +66,7 @@ watch(() => props.tasks, (newTasks) => {
 async function onChange(evt, newStatus) {
   if (!evt.added) return
   if (newStatus === 'DONE' && !props.isAdmin) {
-    alert('Bạn không có quyền tự chuyển Task sang Hoàn thành. Vui lòng bấm vào Task và chọn "Gửi yêu cầu duyệt"!')
+    toast.warning('Bạn không có quyền tự chuyển Task sang Hoàn thành. Vui lòng bấm vào Task và chọn "Gửi yêu cầu duyệt"!')
     emit('refresh')
     return
   }
