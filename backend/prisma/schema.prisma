@@ -178,14 +178,15 @@ model Task {
   completedAt   DateTime? @map("completed_at")
   tags          String[]  @default([])
   isPendingApproval Boolean @default(false)
+
   attachments   Attachment[]
   comments  Comment[]
   timeLogs TimeLog[]
+  assignees TaskAssignee[]
 
   project  Project   @relation(fields: [projectId], references: [id], onDelete : Cascade)
-  parent    Task?   @relation("SubTasks", fields: [parentId], references: [id])
+  parent    Task?   @relation("SubTasks", fields: [parentId], references: [id] , onDelete : Cascade)
   subTasks  Task[]  @relation("SubTasks")
-  assignees TaskAssignee[]
   @@map("tasks")
 }
 

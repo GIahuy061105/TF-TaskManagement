@@ -5,25 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87d0053e-3a9e-4fbb-9672-622d627a09ad" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/icon/BaseButton.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/AppLayout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/project/CreateTaskModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/CreateTaskModal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/tasks.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/tasks.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/project.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/project.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/task.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/task.service.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/project/KanbanBoard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/KanbanBoard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/project/ProjectHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/ProjectHeader.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/project/TaskCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/TaskCard.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/project/TaskDetailModal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/TaskDetailModal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/auth/LoginView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/auth/LoginView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/auth/RegisterView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/auth/RegisterView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/client/ClientView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/client/ClientView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/invoices/InvoiceView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/invoices/InvoiceView.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectDetailView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/projects/ProjectsView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/setting/SettingsView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/setting/SettingsView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +43,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Huy/JavaSpringBoot/TaskFlow/frontend/public&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Huy/JavaSpringBoot/TaskFlow&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;
   }
 }</component>

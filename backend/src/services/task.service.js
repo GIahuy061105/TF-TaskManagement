@@ -22,6 +22,7 @@ export async function createTask(projectId, data) {
       data: {
         projectId,
         title: data.title,
+        parentId: data.parentId || null,
         description: data.description || null,
         status: taskStatus,
         position: data.position ?? nextPosition,

@@ -31,6 +31,7 @@ export async function getProjectById(id, workspaceId) {
       members: { include: { user: true } },
       tasks: {
         include:{
+        subTasks: true,
         assignees:{
             include: { user: true }
             }

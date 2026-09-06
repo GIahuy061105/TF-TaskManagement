@@ -29,7 +29,7 @@ export async function taskRoutes(app) {
     }
   })
 
-  app.delete('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
+  app.delete('/tasks/:id', { preHandler: [authenticate, authorize(['ADMIN'])] }, async (request, reply) => {
     try {
       await deleteTask(request.params.id)
       return reply.code(204).send()
@@ -86,11 +86,11 @@ export async function taskRoutes(app) {
       reply.code(400).send({ message: err.message })
     }
   })
-  app.post('/tasks/:id/attachments', { preHandler: [authenticate] }, async (req, reply) => {
+  app.post('/tasks/:id/attachments', { preHandler: [authenticate , authorize(['ADMIN', 'MEMBER'])] }, async (req, reply) => {
     const attachment = await createAttachment(req.params.id, req.user.userId, req.body);
     return reply.send(attachment);
   })
-  app.get('/tasks/:id/attachments', { preHandler: [authenticate] }, async (request, reply) => {
+  app.get('/tasks/:id/attachments', { preHandler: [authenticate,  authorize(['ADMIN', 'MEMBER' ,'VIEWER'])] }, async (request, reply) => {
       try {
         const attachments = await getAttachmentsByTask(request.params.id)
         return reply.send(attachments)
@@ -99,7 +99,7 @@ export async function taskRoutes(app) {
       }
     })
 
-  app.delete('/tasks/:taskId/attachments/:attachmentId', { preHandler: [authenticate] }, async (request, reply) => {
+  app.delete('/tasks/:taskId/attachments/:attachmentId', { preHandler: [authenticate, authorize(['ADMIN', 'MEMBER'])] }, async (request, reply) => {
      try {
        await deleteAttachment(request.params.attachmentId)
        return reply.code(204).send()

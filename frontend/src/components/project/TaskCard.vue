@@ -2,6 +2,7 @@
   <div
     class="bg-white dark:bg-slate-700 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500 transition-all cursor-pointer group space-y-3"
   >
+    <!-- Badge: Đếm số lượng Subtask ở góc trên -->
     <div class="flex items-center justify-between gap-3">
       <div
         v-if="completionRatio"
@@ -10,8 +11,10 @@
         <BaseIcon :path="mdiClipboardTextOutline" size="16" />
         {{ completionRatio }}
       </div>
+      <div v-else></div>
     </div>
 
+    <!-- Thông tin chính của Task -->
     <div class="flex items-center gap-3">
       <div
         v-if="task.assignees && task.assignees.length > 0"
@@ -49,6 +52,7 @@
       </div>
     </div>
 
+    <!-- Hạn chót và Độ ưu tiên -->
     <div class="flex items-center justify-between gap-3">
       <span
         v-if="task.dueDate"
@@ -60,6 +64,7 @@
         <BaseIcon :path="mdiCalendarMonth" size="14" />
         {{ formatDate(task.dueDate) }}
       </span>
+      <span v-else></span>
 
       <div class="flex-1 flex justify-end gap-2 items-center">
         <span
@@ -76,16 +81,68 @@
         </span>
       </div>
     </div>
+
+    <!-- KHU VỰC SUBTASK CÓ NÚT THẢ XUỐNG -->
+    <div v-if="task.subTasks && task.subTasks.length > 0" class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+
+      <!-- Nút bấm đóng/mở -->
+      <div
+        class="flex items-center justify-between mb-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 p-1 -mx-1 rounded transition-colors"
+        @click.stop="isExpanded = !isExpanded"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Checklist</span>
+          <span class="text-[10px] font-bold text-indigo-500">
+            {{ task.subTasks.filter(st => st.status === 'DONE').length }} / {{ task.subTasks.length }}
+          </span>
+        </div>
+
+        <!-- Nút mũi tên -->
+        <BaseButton variant="ghost" class="!w-6 !h-6 !p-0 pointer-events-none">
+          <BaseIcon :path="isExpanded ? mdiChevronUp : mdiChevronDown" size="18" class="text-slate-400" />
+        </BaseButton>
+      </div>
+
+      <!-- Danh sách subtask thả xuống -->
+      <div v-show="isExpanded" class="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
+        <div
+          v-for="sub in task.subTasks"
+          :key="sub.id"
+          class="flex items-start gap-2 text-xs p-1"
+          @click.stop
+        >
+          <BaseIcon
+            :path="sub.status === 'DONE' ? mdiCheckCircle : mdiCircleOutline"
+            size="14"
+            class="shrink-0 mt-0.5"
+            :class="sub.status === 'DONE' ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'"
+          />
+          <span
+            class="font-medium transition-colors"
+            :class="sub.status === 'DONE' ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300'"
+          >
+            {{ sub.title }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import {
   mdiCalendar,
   mdiCalendarMonth,
-  mdiAccountGroup
+  mdiAccountGroup,
+  mdiCheckCircle,
+  mdiCircleOutline,
+  mdiClipboardTextOutline,
+  mdiChevronDown,
+  mdiChevronUp
 } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
+import BaseButton from '@/components/icon/BaseButton.vue' // QUAN TRỌNG: Đã import BaseButton
 
 const props = defineProps({
   task: {
@@ -93,6 +150,9 @@ const props = defineProps({
     required: true
   }
 })
+
+const isExpanded = ref(false)
+
 const formatDate = (date) => {
   if (!date) return ''
   return new Date(date).toLocaleDateString('vi-VN')
@@ -104,10 +164,10 @@ const isOverdue = computed(() => {
 })
 
 const completionRatio = computed(() => {
-  if (!props.task.subtasks || props.task.subtasks.length === 0) return null
-  const total = props.task.subtasks.length
-  const completed = props.task.subtasks.filter(st => st.isDone).length
-  return `${completed}/${total} subtasks`
+  if (!props.task.subTasks || props.task.subTasks.length === 0) return null
+  const total = props.task.subTasks.length
+  const completed = props.task.subTasks.filter(st => st.status === 'DONE').length
+  return `${completed}/${total} checklist`
 })
 
 const getUserInitials = (fullName) => {
@@ -118,6 +178,7 @@ const getUserInitials = (fullName) => {
   }
   return fullName[0].toUpperCase()
 }
+
 const getStatusLabel = (status) => {
   switch (status) {
     case 'TODO': return 'Cần Làm'
@@ -127,4 +188,3 @@ const getStatusLabel = (status) => {
   }
 }
 </script>
-

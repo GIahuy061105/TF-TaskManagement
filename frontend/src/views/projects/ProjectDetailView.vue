@@ -97,6 +97,27 @@
       @submit="handleCreateTask"
     />
   </AppLayout>
+  <div v-if="deleteConfirm.isOpen" class="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 flex items-center justify-center z-[100] px-4 backdrop-blur-sm transition-colors" @click.self="deleteConfirm.isOpen = false">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-transparent dark:border-slate-700 text-center transform transition-all scale-100">
+          <div class="w-16 h-16 bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+            <BaseIcon :path="mdiAlertCircleOutline" size="32" />
+          </div>
+          <h3 class="text-xl font-black text-slate-900 dark:text-white mb-2">Xóa công việc này?</h3>
+
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+            Bạn có chắc muốn xóa <span class="font-bold text-slate-700 dark:text-slate-200">"{{ deleteConfirm.task?.title }}"</span>?<br/>
+            Toàn bộ Checklist bên trong cũng sẽ bị xóa vĩnh viễn.
+          </p>
+          <div class="flex gap-3">
+            <BaseButton variant="outline" class="flex-1 !py-3" @click="deleteConfirm.isOpen = false">
+              Hủy
+            </BaseButton>
+            <BaseButton variant="primary" class="flex-1 !py-3 !bg-rose-600 hover:!bg-rose-700 !border-none shadow-md shadow-rose-200 dark:shadow-rose-900/20" :loading="loading" @click="executeDeleteTask">
+              Xóa ngay
+            </BaseButton>
+          </div>
+        </div>
+      </div>
 </template>
 
 <script setup>
@@ -110,7 +131,7 @@ import ProjectHeader from '@/components/project/ProjectHeader.vue'
 import KanbanBoard from '@/components/project/KanbanBoard.vue'
 import TaskDetailModal from '@/components/project/TaskDetailModal.vue'
 import CreateTaskModal from '@/components/project/CreateTaskModal.vue'
-import {mdiTimerSand , mdiHomeCityOutline ,mdiBank} from '@mdi/js'
+import {mdiTimerSand , mdiHomeCityOutline ,mdiBank , mdiAlertCircleOutline} from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
 import BaseButton from '@/components/icon/BaseButton.vue'
 import { toast } from 'vue-sonner'
@@ -125,6 +146,7 @@ const project = computed(() => projectStore.currentProject)
 const showModal = ref(false)
 const showDetailModal = ref(false)
 const selectedTask = ref(null)
+const deleteConfirm = ref({ isOpen: false, task: null })
 const loading = ref(false)
 
 onMounted(() => {
@@ -178,11 +200,23 @@ async function handleUpdateTask(payload) {
   }
 }
 
-async function handleDeleteTask(task) {
-  if (!confirm('Bạn có chắc chắn muốn xóa Task này?')) return
-  await projectStore.deleteTask(task.id)
-  closeTaskDetail()
-  await refreshProject()
+function handleDeleteTask(task) {
+  deleteConfirm.value = { isOpen: true, task }
+}
+async function executeDeleteTask() {
+  if (!deleteConfirm.value.task) return
+  loading.value = true
+  try {
+    await projectStore.deleteTask(deleteConfirm.value.task.id)
+    deleteConfirm.value.isOpen = false
+    closeTaskDetail()
+    await refreshProject()
+    toast.success('Đã xóa Task và toàn bộ Checklist con!')
+  } catch (err) {
+    toast.error('Lỗi khi xóa Task')
+  } finally {
+    loading.value = false
+  }
 }
 
 async function handleRequestApproval(task) {

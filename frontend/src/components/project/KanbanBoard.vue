@@ -56,10 +56,11 @@ const taskColumns = ref({ TODO: [], IN_PROGRESS: [], DONE: [] })
 
 watch(() => props.tasks, (newTasks) => {
   if (!newTasks) return
+  const parentTasks = newTasks.filter(t => !t.parentId)
   taskColumns.value = {
-    TODO: newTasks.filter(t => t.status === 'TODO').sort((a, b) => a.position - b.position),
-    IN_PROGRESS: newTasks.filter(t => t.status === 'IN_PROGRESS').sort((a, b) => a.position - b.position),
-    DONE: newTasks.filter(t => t.status === 'DONE').sort((a, b) => a.position - b.position)
+    TODO: parentTasks.filter(t => t.status === 'TODO').sort((a, b) => a.position - b.position),
+    IN_PROGRESS: parentTasks.filter(t => t.status === 'IN_PROGRESS').sort((a, b) => a.position - b.position),
+    DONE: parentTasks.filter(t => t.status === 'DONE').sort((a, b) => a.position - b.position)
   }
 }, { immediate: true, deep: true })
 

@@ -98,6 +98,46 @@
               </p>
             </div>
           </div>
+          <div v-if="!task.parentId" class="mb-6">
+            <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Checklist công việc</p>
+
+            <div class="space-y-2 mb-3">
+              <div v-for="subtask in task.subTasks" :key="subtask.id" class="flex items-center gap-3 group bg-slate-50/50 dark:bg-slate-700/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700 transition-colors">
+                <input
+                  type="checkbox"
+                  :checked="subtask.status === 'DONE'"
+                  @change="handleToggleSubtask(subtask)"
+                  class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                />
+                <span
+                  :class="subtask.status === 'DONE' ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'"
+                  class="text-sm font-semibold flex-1 transition-all"
+                >
+                  {{ subtask.title }}
+                </span>
+                <BaseButton
+                  v-if="!authStore.isViewer"
+                  variant="dangerGhost"
+                  size="icon"
+                  class="opacity-0 group-hover:opacity-100 !w-6 !h-6"
+                  @click="handleDeleteSubtask(subtask.id)"
+                >
+                  <BaseIcon :path="mdiTrashCan" size="14"/>
+                </BaseButton>
+              </div>
+            </div>
+
+            <div v-if="!authStore.isViewer" class="relative">
+              <input
+                v-model="newSubtaskTitle"
+                @keydown.enter.prevent="handleAddSubtask"
+                type="text"
+                placeholder="Thêm mục cần làm... (Nhấn Enter)"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white focus:border-indigo-500 outline-none text-sm font-medium transition-colors"
+                :disabled="isAddingSubtask"
+              />
+            </div>
+          </div>
 
           <div>
             <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Mô tả công việc</p>
@@ -302,7 +342,7 @@ import { useProjectStore } from '@/stores/project.store.js'
 import {
   mdiPencil, mdiTimerSand, mdiCheckDecagram, mdiDeleteOutline, mdiClose,
   mdiCalendarMonth, mdiClockOutline, mdiAttachment, mdiCloudUploadOutline,
-  mdiMessageTextOutline, mdiSend,
+  mdiMessageTextOutline, mdiSend, mdiTrashCan ,
   mdiFileDocumentOutline, mdiFilePdfBox, mdiImageOutline, mdiZipBoxOutline, mdiFileWordBox, mdiFileExcelBox
 } from '@mdi/js'
 import BaseIcon from '@/components/icon/BaseIcon.vue'
@@ -323,6 +363,8 @@ const form = ref({})
 const comments = ref([])
 const newComment = ref('')
 const isSubmittingComment = ref(false)
+const newSubtaskTitle = ref('')
+const isAddingSubtask = ref(false)
 
 watch(() => props.task, (val) => {
   form.value = {
@@ -449,6 +491,69 @@ async function removeFile(index, file) {
   } catch (error) {
     console.error("Lỗi khi xóa file:", error);
     toast.error("Không thể xóa file từ hệ thống lưu trữ!");
+  }
+}
+async function handleAddSubtask() {
+  if (!newSubtaskTitle.value.trim() || isAddingSubtask.value) return
+  isAddingSubtask.value = true
+  try {
+    const payload = {
+      title: newSubtaskTitle.value,
+      parentId: props.task.id,
+      projectId: props.task.projectId,
+      status: 'TODO'
+    }
+    const created = await projectStore.createTask(props.task.projectId, payload)
+    if (!props.task.subTasks) props.task.subTasks = []
+    props.task.subTasks.push(created)
+    const storeTask = projectStore.currentProject.tasks.find(t => t.id === props.task.id)
+    if (storeTask) {
+      if (!storeTask.subTasks) storeTask.subTasks = []
+      storeTask.subTasks.push(created)
+    }
+    newSubtaskTitle.value = ''
+  } catch (err) {
+    toast.error('Lỗi khi thêm checklist')
+  } finally {
+    isAddingSubtask.value = false
+  }
+}
+async function handleToggleSubtask(subtask) {
+  const newStatus = subtask.status === 'DONE' ? 'TODO' : 'DONE'
+    subtask.status = newStatus
+  const storeTask = projectStore.currentProject.tasks.find(t => t.id === props.task.id)
+  if (storeTask && storeTask.subTasks) {
+    const st = storeTask.subTasks.find(s => s.id === subtask.id)
+    if (st) st.status = newStatus
+  }
+
+  try {
+    await projectStore.updateTask(subtask.id, { status: newStatus })
+    const allDone = props.task.subTasks.every(st => st.status === 'DONE')
+    if (allDone && props.task.status !== 'DONE') {
+      toast.success('🎉 Đã hoàn thành tất cả checklist! Task tự động chuyển sang DONE.')
+      emit('update', { ...props.task, status: 'DONE' })
+    }
+  } catch (err) {
+    subtask.status = newStatus === 'DONE' ? 'TODO' : 'DONE'
+    if (storeTask && storeTask.subTasks) {
+      const st = storeTask.subTasks.find(s => s.id === subtask.id)
+      if (st) st.status = subtask.status
+    }
+    toast.error('Lỗi khi cập nhật trạng thái')
+  }
+}
+
+async function handleDeleteSubtask(subtaskId) {
+  try {
+    await projectStore.deleteTask(subtaskId)
+        props.task.subTasks = props.task.subTasks.filter(st => st.id !== subtaskId)
+    const storeTask = projectStore.currentProject.tasks.find(t => t.id === props.task.id)
+    if (storeTask && storeTask.subTasks) {
+      storeTask.subTasks = storeTask.subTasks.filter(st => st.id !== subtaskId)
+    }
+  } catch (err) {
+    toast.error('Lỗi khi xóa checklist')
   }
 }
 </script>
