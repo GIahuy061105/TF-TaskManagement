@@ -1,5 +1,4 @@
 import { Resend } from 'resend'
-
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export const sendEmail = async (to, subject, htmlContent) => {
@@ -10,10 +9,12 @@ export const sendEmail = async (to, subject, htmlContent) => {
       subject: subject,
       html: htmlContent
     })
-    console.log("Gửi mail thành công:", data)
+    if (data.error) {
+      throw new Error(data.error.message)
+    }
     return data
   } catch (error) {
-    console.error("Lỗi Resend:", error)
+    console.error("❌ Lỗi Gốc Từ Resend:", error.message || error)
     throw error
   }
 }
