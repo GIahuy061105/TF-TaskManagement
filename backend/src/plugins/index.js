@@ -4,9 +4,10 @@ import cookie from '@fastify/cookie'
 
 export async function registerPlugins(app) {
   await app.register(cors, {
-    origin: ['http://localhost:5173','http://localhost:5174', 'http://localhost:5175'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    credentials: true
+  origin: 'https://tf-taskmanagement.vercel.app',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-workspace-id']
   })
 
   await app.register(cookie)
