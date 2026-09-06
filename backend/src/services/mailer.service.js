@@ -1,29 +1,19 @@
-import nodemailer from 'nodemailer'
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 465,
-  secure: true,
-  service: 'gmail',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  },
-  tls: {
-      rejectUnauthorized: false
-  }
-})
+import { Resend } from 'resend'
 
-export async function sendEmail(to, subject, htmlContent) {
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export const sendEmail = async (to, subject, htmlContent) => {
   try {
-    await transporter.sendMail({
-      from: `"TaskFlow System" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
+    const data = await resend.emails.send({
+      from: 'TaskFlow <onboarding@resend.dev>',
+      to: to,
+      subject: subject,
       html: htmlContent
     })
-    console.log(`✅ Đã gửi email thành công tới: ${to}`)
+    console.log("Gửi mail thành công:", data)
+    return data
   } catch (error) {
-    console.error("❌ Lỗi gửi email:", error)
-    throw new Error('Không thể gửi email lúc này. Vui lòng thử lại sau.')
+    console.error("Lỗi Resend:", error)
+    throw error
   }
 }
